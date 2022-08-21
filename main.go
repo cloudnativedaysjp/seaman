@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"sort"
 
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
@@ -17,9 +19,11 @@ import (
 )
 
 func main() {
-	confFile, err := argParse()
-	if err != nil {
-		fmt.Println(err)
+	var confFile string
+	flag.StringVar(&confFile, "config", "", "")
+	flag.Parse()
+	if confFile == "" {
+		fmt.Println("flag --config must be specified")
 		os.Exit(1)
 	}
 	conf, err := loadConf(confFile)
@@ -56,11 +60,6 @@ func main() {
 	githubApiDriver := githubapi.NewGitHubApiDriver(conf.GitHub.AccessToken)
 	gitCommandDriver := gitcommand.NewGitCommandDriver(conf.GitHub.Username, conf.GitHub.AccessToken)
 
-	{ // common
-		c := controller.NewCommonController(slackDriverFactory)
-		socketmodeHandler.HandleInteractionBlockAction(
-			global.ActIdCommon_Cancel, c.InteractionCancel)
-	}
 	{ // release
 		c := controller.NewReleaseController(
 			slackDriverFactory, gitCommandDriver, githubApiDriver,
@@ -77,6 +76,18 @@ func main() {
 			global.ActIdRelease_SelectedLevelPatch, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
 			global.ActIdRelease_OK, c.CreatePullRequestForRelease)
+	}
+	{ // common (THIS MUST BE DECLARED AT THE END)
+		var cmds []string
+		for cmd := range subcommands {
+			cmds = append(cmds, cmd)
+		}
+		sort.SliceStable(cmds, func(i, j int) bool { return cmds[i] < cmds[j] })
+		c := controller.NewCommonController(slackDriverFactory, cmds)
+		socketmodeHandler.HandleEvents(
+			slackevents.AppMention, middlewareMessagePrefixIs("help", c.ShowCommands))
+		socketmodeHandler.HandleInteractionBlockAction(
+			global.ActIdCommon_Cancel, c.InteractionCancel)
 	}
 
 	socketmodeHandler.RunEventLoop()

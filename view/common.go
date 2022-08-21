@@ -2,9 +2,32 @@ package view
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/slack-go/slack"
 )
+
+func ShowCommands(commands []string) slack.Msg {
+	result, _ := showCommands(commands)
+	return result
+}
+
+func showCommands(commands []string) (slack.Msg, error) {
+	return castFromStringToMsg(replaceBackquote(fmt.Sprintf(`
+{
+	"blocks": [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "以下のコマンドが存在します。\n<backquote><backquote><backquote>%s<backquote><backquote><backquote>"
+			}
+		}
+	]
+}
+`, strings.Join(commands, `\n`),
+	)))
+}
 
 func SomethingIsWrong(messageTs string) slack.Msg {
 	result, _ := somethingIsWrong(messageTs)
