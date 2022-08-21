@@ -26,8 +26,12 @@ func (m OrgRepo) Repo() string {
 	return m.repo
 }
 
+func (m OrgRepo) RepositoryUrl() string {
+	return fmt.Sprintf("https://github.com/%s/%s", m.org, m.repo)
+}
+
 func (m OrgRepo) PullRequestUrl(number int) string {
-	return fmt.Sprintf("https://github.com/%s/%s/pull/%d", m.org, m.repo, number)
+	return fmt.Sprintf("%s/pull/%d", m.RepositoryUrl(), number)
 }
 
 func (m OrgRepo) WithLevel(level string) OrgRepoLevel {

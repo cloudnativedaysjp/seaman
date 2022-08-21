@@ -61,9 +61,12 @@ func main() {
 	gitCommandDriver := gitcommand.NewGitCommandDriver(conf.GitHub.Username, conf.GitHub.AccessToken)
 
 	{ // release
+		var targets []controller.Target
+		for _, target := range conf.Release.Targets {
+			targets = append(targets, controller.Target(target))
+		}
 		c := controller.NewReleaseController(
-			slackDriverFactory, gitCommandDriver, githubApiDriver,
-			conf.Release.Targets, conf.Release.BaseBranch)
+			slackDriverFactory, gitCommandDriver, githubApiDriver, targets)
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middlewareMessagePrefixIs("release", c.SelectRepository))
 		socketmodeHandler.HandleInteractionBlockAction(

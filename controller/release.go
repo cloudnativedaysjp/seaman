@@ -16,21 +16,26 @@ import (
 	"github.com/cloudnativedaysjp/slackbot/view"
 )
 
+type Target struct {
+	Url        string
+	BaseBranch string
+}
+
 type ReleaseController struct {
 	slackFactory slack_driver.SlackDriverFactoryIface
 	service      *service.ReleaseService
 	log          *zap.Logger
 
-	targets []string
+	targets []Target
 }
 
 func NewReleaseController(
 	slackFactory slack_driver.SlackDriverFactoryIface,
 	gitcommand gitcommand.GitCommandIface,
 	githubapi githubapi.GitHubApiIface,
-	targets []string, baseBranch string,
+	targets []Target,
 ) *ReleaseController {
-	service := service.NewReleaseService(gitcommand, githubapi, baseBranch)
+	service := service.NewReleaseService(gitcommand, githubapi)
 	logger, _ := zap.NewDevelopment()
 	return &ReleaseController{slackFactory, service, logger, targets}
 }
@@ -50,8 +55,13 @@ func (c *ReleaseController) SelectRepository(evt *socketmode.Event, client *sock
 		logger.Errorf("failed to initialize Slack client: %v\n", err)
 	}
 
+	var targetUrls []string
+	for _, target := range c.targets {
+		targetUrls = append(targetUrls, target.Url)
+	}
+
 	if err := sc.PostMessage(ctx, channelId,
-		view.ReleaseListRepo(c.targets),
+		view.ReleaseListRepo(targetUrls),
 	); err != nil {
 		logger.Errorf("failed to post message: %v\n", err)
 		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong("None"))
@@ -138,15 +148,25 @@ func (c *ReleaseController) CreatePullRequestForRelease(evt *socketmode.Event, c
 
 	orgRepoLevel, err := model.NewOrgRepoLevel(callbackValue)
 	if err != nil {
-		logger.Errorf("ERROR: callback value is %s\n", interaction.ActionCallback.BlockActions[0].Value)
+		logger.Errorf(
+			"ERROR: callback value is %s\n", interaction.ActionCallback.BlockActions[0].Value)
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
 		return
 	}
+
 	if err := sc.UpdateMessage(ctx, channelId, messageTs, view.ReleaseProcessing()); err != nil {
 		logger.Errorf("failed to post message: %v", err)
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
 		return
 	}
 
-	c.service.CreatePullRequest(ctx, sc, channelId, messageTs, orgRepoLevel)
+	var baseBranch string
+	repoUrl := orgRepoLevel.RepositoryUrl()
+	for _, target := range c.targets {
+		if target.Url == repoUrl {
+			baseBranch = target.BaseBranch
+			break
+		}
+	}
+	c.service.CreatePullRequest(ctx, sc, channelId, messageTs, orgRepoLevel, baseBranch)
 }

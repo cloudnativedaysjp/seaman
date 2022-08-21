@@ -21,21 +21,19 @@ type ReleaseService struct {
 	gitcommand gitcommand.GitCommandIface
 	githubapi  githubapi.GitHubApiIface
 	log        *zap.Logger
-
-	baseBranch string
 }
 
 func NewReleaseService(
 	gitcommand gitcommand.GitCommandIface,
 	githubapi githubapi.GitHubApiIface,
-	baseBranch string,
 ) *ReleaseService {
 	logger, _ := zap.NewDevelopment()
-	return &ReleaseService{gitcommand, githubapi, logger, baseBranch}
+	return &ReleaseService{gitcommand, githubapi, logger}
 }
 
 func (s ReleaseService) CreatePullRequest(ctx context.Context,
-	sc slack_driver.SlackIface, channelId, messageTs string, orgRepoLevel model.OrgRepoLevel,
+	sc slack_driver.SlackIface, channelId, messageTs string,
+	orgRepoLevel model.OrgRepoLevel, targetBaseBranch string,
 ) {
 	logger := s.log.With(zap.String("messageTs", messageTs)).Sugar()
 	org := orgRepoLevel.Org()
@@ -75,11 +73,13 @@ func (s ReleaseService) CreatePullRequest(ctx context.Context,
 	}
 	defer func() {
 		if err := s.githubapi.DeleteBranch(ctx, org, repo, releaseHeadBranch); err != nil {
-			logger.Info(fmt.Sprintf("failed to remove remote branch (%s): %v", releaseHeadBranch, err))
+			logger.Info(fmt.Sprintf(
+				"failed to remove remote branch (%s): %v", releaseHeadBranch, err))
 		}
 	}()
 	// create -> label -> merge PullRequest
-	prNum, err := s.githubapi.CreatePullRequest(ctx, org, repo, releaseHeadBranch, s.baseBranch, "[dreamkast-releasebot] Automatic Release", "Automatic Release")
+	prNum, err := s.githubapi.CreatePullRequest(ctx, org, repo, releaseHeadBranch,
+		targetBaseBranch, "[dreamkast-releasebot] Automatic Release", "Automatic Release")
 	if err != nil {
 		logger.Errorf("CreatePullRequest() was failed: %v", err)
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
@@ -91,7 +91,9 @@ func (s ReleaseService) CreatePullRequest(ctx context.Context,
 		return
 	}
 	// update Slack Message
-	if err := sc.UpdateMessage(ctx, channelId, messageTs, view.ReleaseDisplayPrLink(orgRepoLevel, prNum)); err != nil {
+	if err := sc.UpdateMessage(
+		ctx, channelId, messageTs, view.ReleaseDisplayPrLink(orgRepoLevel, prNum),
+	); err != nil {
 		logger.Errorf("UpdateMessage() was failed: %v", err)
 		return
 	}

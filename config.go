@@ -56,6 +56,10 @@ type GitHubConfig struct {
 // for each subcommand
 
 type ReleaseConfig struct {
-	Targets    []string `json:"targets" validate:"required"`
-	BaseBranch string   `json:"baseBranch" default:"main"`
+	Targets []ReleaseTarget `json:"targets" validate:"required"`
+}
+
+type ReleaseTarget struct {
+	Url        string `json:"url" validate:"required"`
+	BaseBranch string `json:"baseBranch" default:"main"`
 }

@@ -6,6 +6,6 @@ github:
   username: ShotaKitazawa
   accessToken: ${GITHUB_ACCESS_TOKEN}
 release:
-  baseBranch: main
   targets:
-    - https://github.com/ShotaKitazawa/kube-portal
+  - url: https://github.com/ShotaKitazawa/kube-portal
+    baseBranch: master
