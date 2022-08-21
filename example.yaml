@@ -1,0 +1,11 @@
+debug: false
+slack:
+  botToken: ${SLACK_BOT_TOKEN}
+  appToken: ${SLACK_APP_TOKEN}
+github:
+  username: ShotaKitazawa
+  accessToken: ${GITHUB_ACCESS_TOKEN}
+release:
+  targets:
+  - url: https://github.com/ShotaKitazawa/kube-portal
+    baseBranch: master
