@@ -71,10 +71,13 @@ func (s ReleaseService) CreatePullRequest(ctx context.Context,
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
 		return
 	}
+	passFlag := false
 	defer func() {
-		if err := s.githubapi.DeleteBranch(ctx, org, repo, releaseHeadBranch); err != nil {
-			logger.Info(fmt.Sprintf(
-				"failed to remove remote branch (%s): %v", releaseHeadBranch, err))
+		if !passFlag {
+			if err := s.githubapi.DeleteBranch(ctx, org, repo, releaseHeadBranch); err != nil {
+				logger.Info(fmt.Sprintf(
+					"failed to remove remote branch (%s): %v", releaseHeadBranch, err))
+			}
 		}
 	}()
 	// create -> label -> merge PullRequest
@@ -90,6 +93,7 @@ func (s ReleaseService) CreatePullRequest(ctx context.Context,
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
 		return
 	}
+	passFlag = true
 	// update Slack Message
 	if err := sc.UpdateMessage(
 		ctx, channelId, messageTs, view.ReleaseDisplayPrLink(orgRepoLevel, prNum),
