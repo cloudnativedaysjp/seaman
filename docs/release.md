@@ -28,10 +28,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: >-
-      contains(github.event.pull_request.labels.*.name, 'release/major') ||
-      contains(github.event.pull_request.labels.*.name, 'release/minor') ||
-      contains(github.event.pull_request.labels.*.name, 'release/patch')
     steps:
       - uses: actions/checkout@v2
 
