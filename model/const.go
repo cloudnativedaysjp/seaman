@@ -1,4 +1,4 @@
-package global
+package model
 
 // Action IDs
 const (

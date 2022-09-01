@@ -12,10 +12,10 @@ import (
 	"github.com/slack-go/slack/socketmode"
 
 	"github.com/cloudnativedaysjp/chatbot/controller"
-	"github.com/cloudnativedaysjp/chatbot/global"
 	"github.com/cloudnativedaysjp/chatbot/infrastructure/gitcommand"
 	"github.com/cloudnativedaysjp/chatbot/infrastructure/githubapi"
 	slack_driver "github.com/cloudnativedaysjp/chatbot/infrastructure/slack"
+	"github.com/cloudnativedaysjp/chatbot/model"
 )
 
 func main() {
@@ -70,15 +70,15 @@ func main() {
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middlewareMessagePrefixIs("release", c.SelectRepository))
 		socketmodeHandler.HandleInteractionBlockAction(
-			global.ActIdRelease_SelectedRepository, c.SelectReleaseLevel)
+			model.ActIdRelease_SelectedRepository, c.SelectReleaseLevel)
 		socketmodeHandler.HandleInteractionBlockAction(
-			global.ActIdRelease_SelectedLevelMajor, c.SelectConfirmation)
+			model.ActIdRelease_SelectedLevelMajor, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
-			global.ActIdRelease_SelectedLevelMinor, c.SelectConfirmation)
+			model.ActIdRelease_SelectedLevelMinor, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
-			global.ActIdRelease_SelectedLevelPatch, c.SelectConfirmation)
+			model.ActIdRelease_SelectedLevelPatch, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
-			global.ActIdRelease_OK, c.CreatePullRequestForRelease)
+			model.ActIdRelease_OK, c.CreatePullRequestForRelease)
 	}
 	{ // common (THIS MUST BE DECLARED AT THE END)
 		var cmds []string
@@ -90,7 +90,7 @@ func main() {
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middlewareMessagePrefixIs("help", c.ShowCommands))
 		socketmodeHandler.HandleInteractionBlockAction(
-			global.ActIdCommon_Cancel, c.InteractionCancel)
+			model.ActIdCommon_Cancel, c.InteractionCancel)
 	}
 
 	if err := socketmodeHandler.RunEventLoop(); err != nil {

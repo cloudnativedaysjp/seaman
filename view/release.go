@@ -6,7 +6,6 @@ import (
 
 	"github.com/slack-go/slack"
 
-	"github.com/cloudnativedaysjp/chatbot/global"
 	"github.com/cloudnativedaysjp/chatbot/model"
 )
 
@@ -53,7 +52,7 @@ func releaseListRepo(repoUrls []string) (slack.Msg, error) {
 										"type": "plain_text",
 										"text": "Select an item",
 									},
-									"action_id": global.ActIdRelease_SelectedRepository,
+									"action_id": model.ActIdRelease_SelectedRepository,
 									"options":   options,
 								},
 								map[string]interface{}{
@@ -62,7 +61,7 @@ func releaseListRepo(repoUrls []string) (slack.Msg, error) {
 										"type": "plain_text",
 										"text": "Cancel",
 									},
-									"action_id": global.ActIdCommon_Cancel,
+									"action_id": model.ActIdCommon_Cancel,
 									"style":     "danger",
 								},
 							},
@@ -100,28 +99,28 @@ func releaseListLevel(orgRepo model.OrgRepo) (slack.Msg, error) {
 									"type": "button",
 									"text": map[string]interface{}{
 										"type": "plain_text",
-										"text": global.CallbackValueRelease_VersionMajor,
+										"text": model.CallbackValueRelease_VersionMajor,
 									},
-									"action_id": global.ActIdRelease_SelectedLevelMajor,
-									"value":     orgRepo.WithLevel(global.CallbackValueRelease_VersionMajor).String(),
+									"action_id": model.ActIdRelease_SelectedLevelMajor,
+									"value":     orgRepo.WithLevel(model.CallbackValueRelease_VersionMajor).String(),
 								},
 								map[string]interface{}{
 									"type": "button",
 									"text": map[string]interface{}{
-										"text": global.CallbackValueRelease_VersionMinor,
+										"text": model.CallbackValueRelease_VersionMinor,
 										"type": "plain_text",
 									},
-									"action_id": global.ActIdRelease_SelectedLevelMinor,
-									"value":     orgRepo.WithLevel(global.CallbackValueRelease_VersionMinor).String(),
+									"action_id": model.ActIdRelease_SelectedLevelMinor,
+									"value":     orgRepo.WithLevel(model.CallbackValueRelease_VersionMinor).String(),
 								},
 								map[string]interface{}{
 									"type": "button",
 									"text": map[string]interface{}{
 										"type": "plain_text",
-										"text": global.CallbackValueRelease_VersionPatch,
+										"text": model.CallbackValueRelease_VersionPatch,
 									},
-									"action_id": global.ActIdRelease_SelectedLevelPatch,
-									"value":     orgRepo.WithLevel(global.CallbackValueRelease_VersionPatch).String(),
+									"action_id": model.ActIdRelease_SelectedLevelPatch,
+									"value":     orgRepo.WithLevel(model.CallbackValueRelease_VersionPatch).String(),
 								},
 								map[string]interface{}{
 									"type": "button",
@@ -129,7 +128,7 @@ func releaseListLevel(orgRepo model.OrgRepo) (slack.Msg, error) {
 										"type": "plain_text",
 										"text": "Cancel",
 									},
-									"action_id": global.ActIdCommon_Cancel,
+									"action_id": model.ActIdCommon_Cancel,
 									"style":     "danger",
 								},
 							},
@@ -173,7 +172,7 @@ func releaseConfirmation(orgRepoLevel model.OrgRepoLevel) (slack.Msg, error) {
 									"type": "plain_text",
 									"text": "OK",
 								},
-								"action_id": global.ActIdRelease_OK,
+								"action_id": model.ActIdRelease_OK,
 								"value":     orgRepoLevel.String(),
 							},
 							map[string]interface{}{
@@ -182,7 +181,7 @@ func releaseConfirmation(orgRepoLevel model.OrgRepoLevel) (slack.Msg, error) {
 									"type": "plain_text",
 									"text": "Cancel",
 								},
-								"action_id": global.ActIdCommon_Cancel,
+								"action_id": model.ActIdCommon_Cancel,
 								"style":     "danger",
 							},
 						},
