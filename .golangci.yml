@@ -1,0 +1,35 @@
+linters:
+  disable-all: true
+  enable:
+  - deadcode
+  - errcheck
+  - gosimple
+  - govet
+  - ineffassign
+  - misspell
+  - nilerr
+  - nolintlint
+  - staticcheck
+  - structcheck
+  - typecheck
+  - unused
+  - varcheck
+
+linters-settings:
+  nolintlint:
+    allow-unused: false
+    allow-leading-space: false
+    require-specific: true
+  staticcheck:
+    go: "1.19"
+  stylecheck:
+    go: "1.19"
+  unused:
+    go: "1.19"
+
+run:
+  timeout: 10m
+  skip-files:
+  - "zz_generated.*\\.go$"
+  allow-parallel-runners: true
+
