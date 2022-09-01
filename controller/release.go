@@ -8,12 +8,12 @@ import (
 	"github.com/slack-go/slack/socketmode"
 	"go.uber.org/zap"
 
-	"github.com/cloudnativedaysjp/slackbot/infrastructure/gitcommand"
-	"github.com/cloudnativedaysjp/slackbot/infrastructure/githubapi"
-	slack_driver "github.com/cloudnativedaysjp/slackbot/infrastructure/slack"
-	"github.com/cloudnativedaysjp/slackbot/model"
-	"github.com/cloudnativedaysjp/slackbot/service"
-	"github.com/cloudnativedaysjp/slackbot/view"
+	"github.com/cloudnativedaysjp/chatbot/infrastructure/gitcommand"
+	"github.com/cloudnativedaysjp/chatbot/infrastructure/githubapi"
+	slack_driver "github.com/cloudnativedaysjp/chatbot/infrastructure/slack"
+	"github.com/cloudnativedaysjp/chatbot/model"
+	"github.com/cloudnativedaysjp/chatbot/service"
+	"github.com/cloudnativedaysjp/chatbot/view"
 )
 
 type Target struct {

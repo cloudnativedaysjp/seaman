@@ -8,8 +8,8 @@ import (
 	"github.com/slack-go/slack/socketmode"
 	"go.uber.org/zap"
 
-	slack_driver "github.com/cloudnativedaysjp/slackbot/infrastructure/slack"
-	"github.com/cloudnativedaysjp/slackbot/view"
+	slack_driver "github.com/cloudnativedaysjp/chatbot/infrastructure/slack"
+	"github.com/cloudnativedaysjp/chatbot/view"
 )
 
 type CommonController struct {

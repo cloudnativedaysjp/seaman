@@ -11,11 +11,11 @@ import (
 	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 
-	"github.com/cloudnativedaysjp/slackbot/controller"
-	"github.com/cloudnativedaysjp/slackbot/global"
-	"github.com/cloudnativedaysjp/slackbot/infrastructure/gitcommand"
-	"github.com/cloudnativedaysjp/slackbot/infrastructure/githubapi"
-	slack_driver "github.com/cloudnativedaysjp/slackbot/infrastructure/slack"
+	"github.com/cloudnativedaysjp/chatbot/controller"
+	"github.com/cloudnativedaysjp/chatbot/global"
+	"github.com/cloudnativedaysjp/chatbot/infrastructure/gitcommand"
+	"github.com/cloudnativedaysjp/chatbot/infrastructure/githubapi"
+	slack_driver "github.com/cloudnativedaysjp/chatbot/infrastructure/slack"
 )
 
 func main() {

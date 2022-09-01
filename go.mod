@@ -1,4 +1,4 @@
-module github.com/cloudnativedaysjp/slackbot
+module github.com/cloudnativedaysjp/chatbot
 
 go 1.19
 
