@@ -93,5 +93,8 @@ func main() {
 			global.ActIdCommon_Cancel, c.InteractionCancel)
 	}
 
-	socketmodeHandler.RunEventLoop()
+	if err := socketmodeHandler.RunEventLoop(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
