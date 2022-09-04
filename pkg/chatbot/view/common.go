@@ -2,17 +2,38 @@ package view
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/slack-go/slack"
 )
 
-func ShowCommands(commands []string) slack.Msg {
+func ShowCommands(commands map[string]string) slack.Msg {
 	result, _ := showCommands(commands)
 	return result
 }
 
-func showCommands(commands []string) (slack.Msg, error) {
+func showCommands(commands map[string]string) (slack.Msg, error) {
+	var cmds []struct {
+		command string
+		url     string
+	}
+	for k, v := range commands {
+		cmds = append(cmds, struct {
+			command string
+			url     string
+		}{k, v})
+	}
+	sort.SliceStable(cmds, func(i, j int) bool { return cmds[i].command < cmds[j].command })
+
+	var msg []string
+	for _, c := range cmds {
+		if c.url != "" {
+			msg = append(msg, fmt.Sprintf("• <%s|%s>", c.url, c.command))
+		} else {
+			msg = append(msg, fmt.Sprintf("• %s", c.command))
+		}
+	}
 	return castFromStringToMsg(replaceBackquote(fmt.Sprintf(`
 {
 	"blocks": [
@@ -25,7 +46,7 @@ func showCommands(commands []string) (slack.Msg, error) {
 		}
 	]
 }
-`, strings.Join(commands, `\n`),
+`, strings.Join(msg, `\n`),
 	)))
 }
 

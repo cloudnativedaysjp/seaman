@@ -16,12 +16,12 @@ type CommonController struct {
 	slackFactory slack_driver.SlackDriverFactoryIface
 	log          *zap.Logger
 
-	subcommands []string
+	subcommands map[string]string
 }
 
 func NewCommonController(
 	slackFactory slack_driver.SlackDriverFactoryIface,
-	subcommands []string,
+	subcommands map[string]string,
 ) *CommonController {
 	logger, _ := zap.NewDevelopment()
 	return &CommonController{slackFactory, logger, subcommands}
