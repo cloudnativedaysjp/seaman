@@ -6,7 +6,7 @@ import (
 
 	"github.com/slack-go/slack"
 
-	"github.com/cloudnativedaysjp/chatbot/model"
+	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/model"
 )
 
 func ReleaseListRepo(repoUrls []string) slack.Msg {

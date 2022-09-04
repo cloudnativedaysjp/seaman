@@ -6,11 +6,11 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/cloudnativedaysjp/chatbot/infrastructure/gitcommand"
-	"github.com/cloudnativedaysjp/chatbot/infrastructure/githubapi"
-	slack_driver "github.com/cloudnativedaysjp/chatbot/infrastructure/slack"
-	"github.com/cloudnativedaysjp/chatbot/model"
-	"github.com/cloudnativedaysjp/chatbot/view"
+	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/model"
+	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/view"
+	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
+	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
+	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"
 )
 
 const (
