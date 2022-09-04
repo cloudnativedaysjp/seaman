@@ -16,7 +16,7 @@ func Test_showCommands(t *testing.T) {
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "以下のコマンドが存在します。\n<backquote><backquote><backquote>hoge\nfuga\npiyo<backquote><backquote><backquote>"
+				"text": "以下のコマンドが存在します。\n<backquote><backquote><backquote>• fuga\n• <https://example.com|hoge><backquote><backquote><backquote>"
 			}
 		}
 	]
@@ -26,7 +26,7 @@ func Test_showCommands(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		got, err := showCommands([]string{"hoge", "fuga", "piyo"})
+		got, err := showCommands(map[string]string{"hoge": "https://example.com", "fuga": ""})
 		if err != nil {
 			t.Errorf("error = %v", err)
 			return

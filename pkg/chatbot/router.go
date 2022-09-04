@@ -3,13 +3,13 @@ package chatbot
 import (
 	"log"
 	"os"
-	"sort"
 
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/controller"
+	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/middleware"
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/model"
 	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
 	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
@@ -52,8 +52,16 @@ func Run(conf *Config) error {
 		}
 		c := controller.NewReleaseController(
 			slackDriverFactory, gitCommandDriver, githubApiDriver, targets)
+
 		socketmodeHandler.HandleEvents(
-			slackevents.AppMention, middlewareMessagePrefixIs("release", c.SelectRepository))
+			slackevents.AppMention, middleware.MiddlewareSet(
+				c.SelectRepository,
+				middleware.MiddlewareMessagePrefixIs{Prefix: "release"},
+				middleware.MiddlewareHelpMessage{
+					Prefix: "release",
+					URL:    "https://github.com/cloudnativedaysjp/chatbot/blob/main/docs/release.md",
+				},
+			))
 		socketmodeHandler.HandleInteractionBlockAction(
 			model.ActIdRelease_SelectedRepository, c.SelectReleaseLevel)
 		socketmodeHandler.HandleInteractionBlockAction(
@@ -66,14 +74,13 @@ func Run(conf *Config) error {
 			model.ActIdRelease_OK, c.CreatePullRequestForRelease)
 	}
 	{ // common (THIS MUST BE DECLARED AT THE END)
-		var cmds []string
-		for cmd := range subcommands {
-			cmds = append(cmds, cmd)
-		}
-		sort.SliceStable(cmds, func(i, j int) bool { return cmds[i] < cmds[j] })
-		c := controller.NewCommonController(slackDriverFactory, cmds)
+		c := controller.NewCommonController(slackDriverFactory, middleware.Subcommands.List())
+
 		socketmodeHandler.HandleEvents(
-			slackevents.AppMention, middlewareMessagePrefixIs("help", c.ShowCommands))
+			slackevents.AppMention, middleware.MiddlewareSet(
+				c.ShowCommands,
+				middleware.MiddlewareMessagePrefixIs{Prefix: "help"},
+			))
 		socketmodeHandler.HandleInteractionBlockAction(
 			model.ActIdCommon_Cancel, c.InteractionCancel)
 	}
