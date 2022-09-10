@@ -10,8 +10,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/controller"
-	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/middleware"
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/dto"
+	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/middleware"
 	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
 	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
 	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"
