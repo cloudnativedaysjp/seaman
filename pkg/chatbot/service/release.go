@@ -10,6 +10,8 @@ import (
 	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
 	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"
 	"github.com/go-logr/logr"
+	"github.com/go-logr/zapr"
+	"go.uber.org/zap"
 	"golang.org/x/xerrors"
 )
 
@@ -35,7 +37,8 @@ func (s ReleaseService) CreatePullRequest(ctx context.Context,
 ) error {
 	logger, err := logr.FromContext(ctx)
 	if err != nil {
-		return fmt.Errorf("logger is not set in context")
+		zaplogger, _ := zap.NewDevelopment()
+		logger = zapr.NewLogger(zaplogger)
 	}
 	org := orgRepoLevel.Org()
 	repo := orgRepoLevel.Repo()
