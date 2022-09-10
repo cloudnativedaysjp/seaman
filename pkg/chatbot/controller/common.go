@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zapr"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
@@ -20,53 +22,61 @@ type CommonController struct {
 }
 
 func NewCommonController(
+	logger *zap.Logger,
 	slackFactory slack_driver.SlackDriverFactoryIface,
 	subcommands map[string]string,
 ) *CommonController {
-	logger, _ := zap.NewDevelopment()
 	return &CommonController{slackFactory, logger, subcommands}
 }
 
 func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
-	ctx := context.Background()
 	// this handler is intended to be called by only incoming slackevents.AppMention.
 	// So ignore validation of casting.
 	ev := evt.Data.(slackevents.EventsAPIEvent).InnerEvent.Data.(*slackevents.AppMentionEvent)
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
-	// new instances
-	logger := c.log.With(zap.String("messageTs", messageTs)).Sugar()
+	// init logger & context
+	logger := zapr.NewLogger(c.log.With(zap.String("messageTs", messageTs)))
+	ctx := logr.NewContext(context.Background(), logger)
+	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
-		logger.Errorf("failed to initialize Slack client: %v\n", err)
+		logger.Error(err, "failed to initialize Slack client")
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong("None"))
+		return
 	}
 
 	if err := sc.PostMessage(ctx, channelId,
 		view.ShowCommands(c.subcommands),
 	); err != nil {
-		logger.Errorf("failed to post message: %v\n", err)
+		logger.Error(err, "failed to post message")
 		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong("None"))
+		return
 	}
 }
 
 func (c *CommonController) InteractionCancel(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
-	ctx := context.Background()
 	// this handler is intended to be called by only incoming slack.InteractionCallback.
 	// So ignore validation of casting.
 	interaction := evt.Data.(slack.InteractionCallback)
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
-	// new instances
-	logger := c.log.With(zap.String("messageTs", messageTs)).Sugar()
+	// init logger & context
+	logger := zapr.NewLogger(c.log.With(zap.String("messageTs", messageTs)))
+	ctx := logr.NewContext(context.Background(), logger)
+	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
-		logger.Errorf("failed to initialize Slack client: %v\n", err)
+		logger.Error(err, "failed to initialize Slack client")
+		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
+		return
 	}
 
 	if err := sc.UpdateMessage(ctx, channelId, messageTs, view.Canceled()); err != nil {
-		logger.Errorf("failed to post message: %v", err)
+		logger.Error(err, "failed to post message")
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
+		return
 	}
 }

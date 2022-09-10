@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"go.uber.org/zap"
-
-	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/model"
+	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/dto"
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/view"
 	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
 	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
 	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zapr"
+	"go.uber.org/zap"
+	"golang.org/x/xerrors"
 )
 
 const (
@@ -20,22 +22,24 @@ const (
 type ReleaseService struct {
 	gitcommand gitcommand.GitCommandIface
 	githubapi  githubapi.GitHubApiIface
-	log        *zap.Logger
 }
 
 func NewReleaseService(
 	gitcommand gitcommand.GitCommandIface,
 	githubapi githubapi.GitHubApiIface,
 ) *ReleaseService {
-	logger, _ := zap.NewDevelopment()
-	return &ReleaseService{gitcommand, githubapi, logger}
+	return &ReleaseService{gitcommand, githubapi}
 }
 
 func (s ReleaseService) CreatePullRequest(ctx context.Context,
 	sc slack_driver.SlackIface, channelId, messageTs string,
-	orgRepoLevel model.OrgRepoLevel, targetBaseBranch string,
-) {
-	logger := s.log.With(zap.String("messageTs", messageTs)).Sugar()
+	orgRepoLevel dto.OrgRepoLevel, targetBaseBranch string,
+) error {
+	logger, err := logr.FromContext(ctx)
+	if err != nil {
+		zaplogger, _ := zap.NewDevelopment()
+		logger = zapr.NewLogger(zaplogger)
+	}
 	org := orgRepoLevel.Org()
 	repo := orgRepoLevel.Repo()
 	level := orgRepoLevel.Level()
@@ -44,32 +48,23 @@ func (s ReleaseService) CreatePullRequest(ctx context.Context,
 	// clone repo to working dir
 	repoDir, err := s.gitcommand.Clone(ctx, org, repo)
 	if err != nil {
-		logger.Error(err)
-		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("message: %w", err)
 	}
 	// remove working dir finally
 	defer func() {
 		if err := s.gitcommand.Remove(ctx, repoDir); err != nil {
-			logger.Error(err)
-			return
+			logger.Info(fmt.Sprintf("failed to remove working directory: %v", err))
 		}
 	}()
 	// switch -> empty commit -> push
 	if err := s.gitcommand.SwitchNewBranch(ctx, repoDir, releaseHeadBranch); err != nil {
-		logger.Errorf("SwitchNewBranch() was failed: %v", err)
-		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("message: %w", err)
 	}
 	if err := s.gitcommand.CommitAll(ctx, repoDir, "[Bot] for release!!"); err != nil {
-		logger.Errorf("CommitAll() was failed: %v", err)
-		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("message: %w", err)
 	}
 	if err := s.gitcommand.Push(ctx, repoDir); err != nil {
-		logger.Errorf("Push() was failed: %v", err)
-		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("message: %w", err)
 	}
 	passFlag := false
 	defer func() {
@@ -84,21 +79,17 @@ func (s ReleaseService) CreatePullRequest(ctx context.Context,
 	prNum, err := s.githubapi.CreatePullRequest(ctx, org, repo, releaseHeadBranch,
 		targetBaseBranch, "[dreamkast-releasebot] Automatic Release", "Automatic Release")
 	if err != nil {
-		logger.Errorf("CreatePullRequest() was failed: %v", err)
-		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("message: %w", err)
 	}
 	if err := s.githubapi.LabelPullRequest(ctx, org, repo, prNum, level); err != nil {
-		logger.Errorf("LabelPullRequest() was failed: %v", err)
-		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("message: %w", err)
 	}
 	passFlag = true
 	// update Slack Message
 	if err := sc.UpdateMessage(
 		ctx, channelId, messageTs, view.ReleaseDisplayPrLink(orgRepoLevel, prNum),
 	); err != nil {
-		logger.Errorf("UpdateMessage() was failed: %v", err)
-		return
+		return xerrors.Errorf("message: %w", err)
 	}
+	return nil
 }
