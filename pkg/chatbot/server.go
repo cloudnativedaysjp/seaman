@@ -43,7 +43,7 @@ func Run(conf *Config) error {
 
 	// setup logger
 	zapConf := zap.NewProductionConfig()
-	zapConf.DisableStacktrace = true
+	zapConf.DisableStacktrace = true // due to output wrapped error in errorVerbose
 	logger, err := zapConf.Build()
 	if err != nil {
 		return err
