@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/model"
+	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/dto"
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/view"
 	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
 	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
@@ -31,7 +31,7 @@ func NewReleaseService(
 
 func (s ReleaseService) CreatePullRequest(ctx context.Context,
 	sc slack_driver.SlackIface, channelId, messageTs string,
-	orgRepoLevel model.OrgRepoLevel, targetBaseBranch string,
+	orgRepoLevel dto.OrgRepoLevel, targetBaseBranch string,
 ) error {
 	logger, err := logr.FromContext(ctx)
 	if err != nil {

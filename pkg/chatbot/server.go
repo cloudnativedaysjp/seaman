@@ -11,7 +11,7 @@ import (
 
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/controller"
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/middleware"
-	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/model"
+	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/dto"
 	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
 	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
 	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"
@@ -72,15 +72,15 @@ func Run(conf *Config) error {
 				},
 			))
 		socketmodeHandler.HandleInteractionBlockAction(
-			model.ActIdRelease_SelectedRepository, c.SelectReleaseLevel)
+			dto.ActIdRelease_SelectedRepository, c.SelectReleaseLevel)
 		socketmodeHandler.HandleInteractionBlockAction(
-			model.ActIdRelease_SelectedLevelMajor, c.SelectConfirmation)
+			dto.ActIdRelease_SelectedLevelMajor, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
-			model.ActIdRelease_SelectedLevelMinor, c.SelectConfirmation)
+			dto.ActIdRelease_SelectedLevelMinor, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
-			model.ActIdRelease_SelectedLevelPatch, c.SelectConfirmation)
+			dto.ActIdRelease_SelectedLevelPatch, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
-			model.ActIdRelease_OK, c.CreatePullRequestForRelease)
+			dto.ActIdRelease_OK, c.CreatePullRequestForRelease)
 	}
 	{ // common (THIS MUST BE DECLARED AT THE END)
 		c := controller.NewCommonController(logger,
@@ -92,7 +92,7 @@ func Run(conf *Config) error {
 				middleware.MiddlewareMessagePrefixIs{Prefix: "help"},
 			))
 		socketmodeHandler.HandleInteractionBlockAction(
-			model.ActIdCommon_Cancel, c.InteractionCancel)
+			dto.ActIdCommon_Cancel, c.InteractionCancel)
 	}
 
 	if err := socketmodeHandler.RunEventLoop(); err != nil {

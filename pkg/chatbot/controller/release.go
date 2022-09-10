@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/xerrors"
 
-	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/model"
+	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/dto"
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/service"
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/view"
 	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
@@ -89,7 +89,7 @@ func (c *ReleaseController) SelectReleaseLevel(evt *socketmode.Event, client *so
 		logger.Error(xerrors.Errorf("message: %w", err), "failed to initialize Slack client")
 	}
 
-	orgRepo, err := model.NewOrgRepo(callbackValue)
+	orgRepo, err := dto.NewOrgRepo(callbackValue)
 	if err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "invalid callback value",
 			"callbackValue", interaction.ActionCallback.BlockActions[0].Value)
@@ -121,7 +121,7 @@ func (c *ReleaseController) SelectConfirmation(evt *socketmode.Event, client *so
 		return
 	}
 
-	orgRepoLevel, err := model.NewOrgRepoLevel(callbackValue)
+	orgRepoLevel, err := dto.NewOrgRepoLevel(callbackValue)
 	if err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "invalid callback value",
 			"callbackValue", interaction.ActionCallback.BlockActions[0].Value)
@@ -155,7 +155,7 @@ func (c *ReleaseController) CreatePullRequestForRelease(evt *socketmode.Event, c
 		return
 	}
 
-	orgRepoLevel, err := model.NewOrgRepoLevel(callbackValue)
+	orgRepoLevel, err := dto.NewOrgRepoLevel(callbackValue)
 	if err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "invalid callback value",
 			"callbackValue", interaction.ActionCallback.BlockActions[0].Value)
