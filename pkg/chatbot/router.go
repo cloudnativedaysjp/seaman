@@ -7,6 +7,7 @@ import (
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
+	"go.uber.org/zap"
 
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/controller"
 	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/middleware"
@@ -40,7 +41,15 @@ func Run(conf *Config) error {
 	}
 	socketmodeHandler := socketmode.NewSocketmodeHandler(client)
 
-	// setup some Drivers
+	// setup logger
+	zapConf := zap.NewProductionConfig()
+	zapConf.DisableStacktrace = true
+	logger, err := zapConf.Build()
+	if err != nil {
+		return err
+	}
+
+	// setup some instances
 	slackDriverFactory := slack_driver.NewSlackDriverFactory()
 	githubApiDriver := githubapi.NewGitHubApiDriver(conf.GitHub.AccessToken)
 	gitCommandDriver := gitcommand.NewGitCommandDriver(conf.GitHub.Username, conf.GitHub.AccessToken)
@@ -50,7 +59,7 @@ func Run(conf *Config) error {
 		for _, target := range conf.Release.Targets {
 			targets = append(targets, controller.Target(target))
 		}
-		c := controller.NewReleaseController(
+		c := controller.NewReleaseController(logger,
 			slackDriverFactory, gitCommandDriver, githubApiDriver, targets)
 
 		socketmodeHandler.HandleEvents(
@@ -74,7 +83,8 @@ func Run(conf *Config) error {
 			model.ActIdRelease_OK, c.CreatePullRequestForRelease)
 	}
 	{ // common (THIS MUST BE DECLARED AT THE END)
-		c := controller.NewCommonController(slackDriverFactory, middleware.Subcommands.List())
+		c := controller.NewCommonController(logger,
+			slackDriverFactory, middleware.Subcommands.List())
 
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(

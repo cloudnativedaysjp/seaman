@@ -41,6 +41,7 @@ func showCommands(commands map[string]string) (slack.Msg, error) {
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
+				"verbatim": true,
 				"text": "以下のコマンドが存在します。\n<backquote><backquote><backquote>%s<backquote><backquote><backquote>"
 			}
 		}

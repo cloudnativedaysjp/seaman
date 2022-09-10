@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/slack-go/slack"
+	"golang.org/x/xerrors"
 )
 
 type SlackIface interface {
@@ -32,7 +33,7 @@ func (s *SlackDriver) PostMessage(ctx context.Context, channel string, msg slack
 		slack.MsgOptionBlocks(msg.Blocks.BlockSet...),
 	)
 	if err != nil {
-		return err
+		return xerrors.Errorf("message: %w", err)
 	}
 	return nil
 }
@@ -45,7 +46,7 @@ func (s *SlackDriver) UpdateMessage(ctx context.Context, channel, ts string, msg
 		slack.MsgOptionBlocks(msg.Blocks.BlockSet...),
 	)
 	if err != nil {
-		return err
+		return xerrors.Errorf("message: %w", err)
 	}
 	return nil
 }
