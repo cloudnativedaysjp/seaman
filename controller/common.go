@@ -10,7 +10,7 @@ import (
 	"github.com/slack-go/slack/socketmode"
 	"go.uber.org/zap"
 
-	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/view"
+	"github.com/cloudnativedaysjp/chatbot/view"
 	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"
 )
 

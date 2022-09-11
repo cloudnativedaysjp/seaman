@@ -11,9 +11,9 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/xerrors"
 
-	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/dto"
-	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/service"
-	"github.com/cloudnativedaysjp/chatbot/pkg/chatbot/view"
+	"github.com/cloudnativedaysjp/chatbot/dto"
+	"github.com/cloudnativedaysjp/chatbot/service"
+	"github.com/cloudnativedaysjp/chatbot/view"
 	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
 	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
 	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"

@@ -1,4 +1,4 @@
-package chatbot
+package main
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 
 var validate = validator.New()
 
-func LoadConf(filename string) (*Config, error) {
+func loadConf(filename string) (*Config, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
