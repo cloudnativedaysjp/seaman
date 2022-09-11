@@ -28,13 +28,13 @@ jobs:
           token: ${{ steps.generate_token.outputs.token }}
 
       - name: Update Kubernetes manifests
+        working-directory: dreamkast-infra/manifests/app/chatbot
         run: |
-          cd manifests/app/chatbot
           kustomize edit set image public.ecr.aws/f5j9d0q5/chatbot:${{ github.sha }}
 
       - name: Commit files
+        working-directory: dreamkast-infra/
         run: |
-          cd dreamkast-infra/
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git status
