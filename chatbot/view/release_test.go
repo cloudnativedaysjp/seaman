@@ -3,7 +3,7 @@ package view
 import (
 	"testing"
 
-	"github.com/cloudnativedaysjp/chatbot/dto"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/dto"
 	"github.com/google/go-cmp/cmp"
 )
 

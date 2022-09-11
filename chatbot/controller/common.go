@@ -10,12 +10,12 @@ import (
 	"github.com/slack-go/slack/socketmode"
 	"go.uber.org/zap"
 
-	"github.com/cloudnativedaysjp/chatbot/view"
-	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"
+	infra_slack "github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/slack"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/view"
 )
 
 type CommonController struct {
-	slackFactory slack_driver.SlackDriverFactoryIface
+	slackFactory infra_slack.SlackDriverFactoryIface
 	log          *zap.Logger
 
 	subcommands map[string]string
@@ -23,7 +23,7 @@ type CommonController struct {
 
 func NewCommonController(
 	logger *zap.Logger,
-	slackFactory slack_driver.SlackDriverFactoryIface,
+	slackFactory infra_slack.SlackDriverFactoryIface,
 	subcommands map[string]string,
 ) *CommonController {
 	return &CommonController{slackFactory, logger, subcommands}

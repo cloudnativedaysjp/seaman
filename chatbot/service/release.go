@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cloudnativedaysjp/chatbot/dto"
-	"github.com/cloudnativedaysjp/chatbot/view"
-	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
-	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
-	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
 	"go.uber.org/zap"
 	"golang.org/x/xerrors"
+
+	"github.com/cloudnativedaysjp/chatbot/chatbot/dto"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/gitcommand"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/githubapi"
+	infra_slack "github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/slack"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/view"
 )
 
 const (
@@ -32,7 +33,7 @@ func NewReleaseService(
 }
 
 func (s ReleaseService) CreatePullRequest(ctx context.Context,
-	sc slack_driver.SlackIface, channelId, messageTs string,
+	sc infra_slack.SlackIface, channelId, messageTs string,
 	orgRepoLevel dto.OrgRepoLevel, targetBaseBranch string,
 ) error {
 	logger, err := logr.FromContext(ctx)

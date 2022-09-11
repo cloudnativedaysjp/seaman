@@ -11,12 +11,12 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/xerrors"
 
-	"github.com/cloudnativedaysjp/chatbot/dto"
-	"github.com/cloudnativedaysjp/chatbot/service"
-	"github.com/cloudnativedaysjp/chatbot/view"
-	"github.com/cloudnativedaysjp/chatbot/pkg/gitcommand"
-	"github.com/cloudnativedaysjp/chatbot/pkg/githubapi"
-	slack_driver "github.com/cloudnativedaysjp/chatbot/pkg/slack"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/dto"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/gitcommand"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/githubapi"
+	infra_slack "github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/slack"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/service"
+	"github.com/cloudnativedaysjp/chatbot/chatbot/view"
 )
 
 type Target struct {
@@ -25,7 +25,7 @@ type Target struct {
 }
 
 type ReleaseController struct {
-	slackFactory slack_driver.SlackDriverFactoryIface
+	slackFactory infra_slack.SlackDriverFactoryIface
 	service      *service.ReleaseService
 	log          *zap.Logger
 
@@ -34,7 +34,7 @@ type ReleaseController struct {
 
 func NewReleaseController(
 	logger *zap.Logger,
-	slackFactory slack_driver.SlackDriverFactoryIface,
+	slackFactory infra_slack.SlackDriverFactoryIface,
 	gitcommand gitcommand.GitCommandIface,
 	githubapi githubapi.GitHubApiIface,
 	targets []Target,
