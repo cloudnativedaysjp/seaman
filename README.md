@@ -1,1 +1,3 @@
-# chatbot
+# seaman
+
+SlackBot for CloudNativeDay!

@@ -10,8 +10,8 @@ import (
 	"github.com/slack-go/slack/socketmode"
 	"go.uber.org/zap"
 
-	infra_slack "github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/slack"
-	"github.com/cloudnativedaysjp/chatbot/chatbot/view"
+	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infrastructure/slack"
+	"github.com/cloudnativedaysjp/seaman/seaman/view"
 )
 
 type CommonController struct {

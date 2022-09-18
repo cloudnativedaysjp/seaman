@@ -11,12 +11,12 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/xerrors"
 
-	"github.com/cloudnativedaysjp/chatbot/chatbot/dto"
-	"github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/gitcommand"
-	"github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/githubapi"
-	infra_slack "github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/slack"
-	"github.com/cloudnativedaysjp/chatbot/chatbot/service"
-	"github.com/cloudnativedaysjp/chatbot/chatbot/view"
+	"github.com/cloudnativedaysjp/seaman/seaman/dto"
+	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/gitcommand"
+	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/githubapi"
+	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infrastructure/slack"
+	"github.com/cloudnativedaysjp/seaman/seaman/service"
+	"github.com/cloudnativedaysjp/seaman/seaman/view"
 )
 
 type Target struct {

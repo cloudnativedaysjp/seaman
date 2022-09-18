@@ -1,4 +1,4 @@
-package chatbot
+package seaman
 
 import (
 	"log"
@@ -9,12 +9,12 @@ import (
 	"github.com/slack-go/slack/socketmode"
 	"go.uber.org/zap"
 
-	"github.com/cloudnativedaysjp/chatbot/chatbot/controller"
-	"github.com/cloudnativedaysjp/chatbot/chatbot/dto"
-	"github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/gitcommand"
-	"github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/githubapi"
-	infra_slack "github.com/cloudnativedaysjp/chatbot/chatbot/infrastructure/slack"
-	"github.com/cloudnativedaysjp/chatbot/chatbot/middleware"
+	"github.com/cloudnativedaysjp/seaman/seaman/controller"
+	"github.com/cloudnativedaysjp/seaman/seaman/dto"
+	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/gitcommand"
+	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/githubapi"
+	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infrastructure/slack"
+	"github.com/cloudnativedaysjp/seaman/seaman/middleware"
 )
 
 func Run(conf *Config) error {
@@ -68,7 +68,7 @@ func Run(conf *Config) error {
 				middleware.MiddlewareMessagePrefixIs{Prefix: "release"},
 				middleware.MiddlewareHelpMessage{
 					Prefix: "release",
-					URL:    "https://github.com/cloudnativedaysjp/chatbot/blob/main/docs/release.md",
+					URL:    "https://github.com/cloudnativedaysjp/seaman/blob/main/docs/release.md",
 				},
 			))
 		socketmodeHandler.HandleInteractionBlockAction(

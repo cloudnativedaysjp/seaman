@@ -30,7 +30,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: public.ecr.aws/f5j9d0q5/chatbot
+          images: public.ecr.aws/f5j9d0q5/seaman
           tags: |
             type=sha,prefix=,format=long
             type=ref,event=branch

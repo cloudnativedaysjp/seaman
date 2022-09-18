@@ -28,9 +28,9 @@ jobs:
           token: ${{ steps.generate_token.outputs.token }}
 
       - name: Update Kubernetes manifests
-        working-directory: dreamkast-infra/manifests/app/chatbot
+        working-directory: dreamkast-infra/manifests/app/seaman
         run: |
-          kustomize edit set image public.ecr.aws/f5j9d0q5/chatbot:${{ github.sha }}
+          kustomize edit set image public.ecr.aws/f5j9d0q5/seaman:${{ github.sha }}
 
       - name: Commit files
         working-directory: dreamkast-infra/
@@ -47,7 +47,7 @@ jobs:
           github_token: ${{ steps.generate_token.outputs.token }}
           repository: cloudnativedaysjp/dreamkast-infra
           directory: dreamkast-infra
-          branch: production/chatbot-main
+          branch: production/seaman-main
 
       - name: Create and Merge Pull Request
         uses: "actions/github-script@v2"
@@ -57,9 +57,9 @@ jobs:
             const pr = await github.pulls.create({
               owner: "cloudnativedaysjp",
               repo: "dreamkast-infra",
-              title: "Automated PR (production/chatbot-main)",
+              title: "Automated PR (production/seaman-main)",
               body: "**this PR is automatically created & merged**",
-              head: "production/chatbot-main",
+              head: "production/seaman-main",
               base: "main"
             });
             await github.pulls.merge({

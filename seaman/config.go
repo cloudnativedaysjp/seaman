@@ -1,4 +1,4 @@
-package chatbot
+package seaman
 
 import (
 	"encoding/json"
