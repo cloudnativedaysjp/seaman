@@ -1,3 +1,3 @@
 # seaman
 
-SlackBot for CloudNativeDay!
+SlackBot for CloudNativeDays!
