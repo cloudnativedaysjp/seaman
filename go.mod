@@ -1,4 +1,4 @@
-module github.com/cloudnativedaysjp/chatbot
+module github.com/cloudnativedaysjp/seaman
 
 go 1.19
 

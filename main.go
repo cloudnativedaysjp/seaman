@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cloudnativedaysjp/chatbot/chatbot"
+	"github.com/cloudnativedaysjp/seaman/seaman"
 )
 
 func main() {
@@ -17,13 +17,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	conf, err := chatbot.LoadConf(confFile)
+	conf, err := seaman.LoadConf(confFile)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	if err := chatbot.Run(conf); err != nil {
+	if err := seaman.Run(conf); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
