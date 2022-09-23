@@ -20,6 +20,7 @@ Setup 手順に GitHub Actions の用意の手順も記載されているため�
     * `if: contains(github.event.pull_request.title, '[dreamkast-releasebot]')` : releasebot が作成した PR にのみ反応するようにしています
     * `Generate token` step : GitHub Actions から tag が push されたことを契機に別の action をトリガするために、GitHub App のクレデンシャルを利用するようにしています
         * GitHub App は [`GitOps for CloudNativeDays`](https://github.com/organizations/cloudnativedaysjp/settings/installations/29106044) を利用してください
+        * `APP_ID` , `PRIVATE_KEY` はそれぞれ GitHub の Actions secrets にて値を登録してください
 
 
 ```yaml
