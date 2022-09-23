@@ -3,7 +3,7 @@ name: GitOps for production
 on:
   push:
     tags:
-      - v*
+      - "v*.*.*"
 
 jobs:
   gitops:
