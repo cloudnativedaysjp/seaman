@@ -1,14 +1,24 @@
-name: Push a new tag with Pull Request
+name: Push a new tag with merged Pull Request
 
 on:
   pull_request:
     types: [closed]
 
 jobs:
-  release:
+  tagging:
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.title, '[dreamkast-releasebot]')
     steps:
-      - uses: actions/checkout@v2
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
       - uses: actions-ecosystem/action-release-label@v1
         id: release-label
@@ -25,8 +35,15 @@ jobs:
           current_version: ${{ steps.get-latest-tag.outputs.tag }}
           level: ${{ steps.release-label.outputs.level }}
 
+      - name: set credential
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+          git config remote.origin.url "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}"
+
       - uses: actions-ecosystem/action-push-tag@v1
         if: ${{ steps.release-label.outputs.level != null }}
         with:
           tag: ${{ steps.bump-semver.outputs.new_version }}
           message: '${{ steps.bump-semver.outputs.new_version }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}'
+
