@@ -6,7 +6,7 @@
   "labels": ["dependencies"],
   "packageRules": [
     {
-      "matchUpdateTypes": ["patch", "minor"],
+      "matchUpdateTypes": ["patch", "minor", "digest"],
       "matchPaths": ["go.mod"],
       "groupName": "all minor and patch dependencies on Go",
     },
