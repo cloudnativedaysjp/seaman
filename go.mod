@@ -11,7 +11,7 @@ require (
 	github.com/shurcooL/githubv4 v0.0.0-20220520033151-0b4e3294ff00
 	github.com/slack-go/slack v0.11.2
 	go.uber.org/zap v1.22.0
-	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c
+	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
 	sigs.k8s.io/yaml v1.3.0
 )
