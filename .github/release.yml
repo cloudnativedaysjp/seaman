@@ -1,0 +1,11 @@
+changelog:
+  exclude:
+    labels:
+      - release/*
+  categories:
+    - title: What's Changed
+      labels:
+        - "*"
+    - title: Update dependencies
+      labels:
+        - dependencies
