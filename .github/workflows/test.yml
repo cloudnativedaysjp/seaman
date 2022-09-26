@@ -4,6 +4,7 @@ on: push
 
 jobs:
   gotest:
+    if: github.event.pusher.name != 'dreamkast-cloudnativedays'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
