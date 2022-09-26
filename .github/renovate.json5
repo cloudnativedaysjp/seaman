@@ -8,16 +8,16 @@
     {
       "matchUpdateTypes": ["patch", "minor", "digest"],
       "matchPaths": ["go.mod"],
-      "groupName": "all minor and patch dependencies on Go",
+      "groupName": "all minor, patch, or digest dependencies on Go",
     },
     {
-      "matchPaths": ["Dockerfile", "*.dockerfile"],
+      "matchPackageNames": ["Dockerfile"],
       "groupName": "all dependencies on Dockerfile",
     },
     {
       "matchUpdateTypes": ["patch", "minor"],
-      "matchPaths": ["^.github/workflows/*"],
-      "groupName": "all minor and patch dependencies on Go",
+      "matchPackageNames": ["github-actions"],
+      "groupName": "all dependencies on GitHub Actions",
     },
   ],
   "enabledManagers": [
