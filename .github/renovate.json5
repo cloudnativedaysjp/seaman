@@ -7,7 +7,17 @@
   "packageRules": [
     {
       "matchUpdateTypes": ["patch", "minor"],
-      "groupName": "all minor and patch dependencies",
+      "matchPaths": ["go.mod"],
+      "groupName": "all minor and patch dependencies on Go",
+    },
+    {
+      "matchPaths": ["Dockerfile", "*.dockerfile"],
+      "groupName": "all dependencies on Dockerfile",
+    },
+    {
+      "matchUpdateTypes": ["patch", "minor"],
+      "matchPaths": ["^.github/workflows/*"],
+      "groupName": "all minor and patch dependencies on Go",
     },
   ],
   "enabledManagers": [
