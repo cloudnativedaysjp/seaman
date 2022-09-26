@@ -40,7 +40,7 @@ func (g *GitCommandDriver) HealthCheck() (err error) {
 
 func (g *GitCommandDriver) Clone(ctx context.Context, org, repo string) (string, error) {
 	downloadDir := fmt.Sprintf("/tmp/%s", filepath.Base(repo))
-	cmd := exec.CommandContext(ctx, "git", "clone",
+	cmd := exec.CommandContext(ctx, "git", "clone", "--depth", "1",
 		strings.Join([]string{fmt.Sprintf(baseURL, g.user, g.token), org, repo}, "/"), // https://<user>:<token>@github.com/<org>/<repo>
 		downloadDir)
 	if _, err := cmd.Output(); err != nil {

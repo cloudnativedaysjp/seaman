@@ -16,14 +16,14 @@ func Test_GitCommandDriver(t *testing.T) {
 		// Clone
 		dir, err := driver.Clone(context.Background(), "ShotaKitazawa", "dotfiles")
 		if err != nil {
-			t.Fatalf("error: %s", err)
+			t.Fatal(err)
 		}
 		fmt.Println(dir)
 
 		// SwitchNewBranch
 		err = driver.SwitchNewBranch(context.Background(), dir, "demo")
 		if err != nil {
-			t.Fatalf("error: %s", err)
+			t.Fatal(err)
 		}
 
 		// create new empty file
@@ -33,13 +33,13 @@ func Test_GitCommandDriver(t *testing.T) {
 		// CommitAll
 		err = driver.CommitAll(context.Background(), dir, "for test")
 		if err != nil {
-			t.Fatalf("error: %s", err)
+			t.Fatal(err)
 		}
 
 		// Push
 		err = driver.Push(context.Background(), dir)
 		if err != nil {
-			t.Fatalf("error: %s", err)
+			t.Fatal(err)
 		}
 	})
 }
