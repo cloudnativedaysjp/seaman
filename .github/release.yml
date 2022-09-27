@@ -1,7 +1,7 @@
 changelog:
   exclude:
-    labels:
-      - "release/*"
+    authors:
+      - "dreamkast-cloudnativedays"
   categories:
     - title: ♻ Update dependencies
       labels:
