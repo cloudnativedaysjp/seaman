@@ -6,8 +6,8 @@
   "labels": ["dependencies"],
   "packageRules": [
     {
-      "matchUpdateTypes": ["patch", "minor", "digest"],
       "matchManagers": ["gomod"],
+      "matchUpdateTypes": ["patch", "minor", "digest"],
       "groupName": "all minor, patch, or digest dependencies on Go",
     },
     {
@@ -15,7 +15,6 @@
       "groupName": "all dependencies on Dockerfile",
     },
     {
-      "matchUpdateTypes": ["patch", "minor"],
       "matchManagers": ["github-actions"],
       "groupName": "all dependencies on GitHub Actions",
     },
