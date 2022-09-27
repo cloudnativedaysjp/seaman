@@ -88,6 +88,9 @@ jobs:
 
 「タグが付与されたらデプロイを実施する」ための Action を用意してください。この Action の内容はアプリケーションのデプロイ方法によって異なります。
 
-* 例1. [seaman](https://github.com/cloudnativedaysjp/seaman/blob/main/.github/workflows/gitops-prd.yml) : dreamkast-infra リポジトリのマニフェスト更新
-* 例2. [dreamkast-function](https://github.com/cloudnativedaysjp/dreamkast-functions/blob/main/.github/workflows/deploy-prd.yml) : AWS CDK を用いてデプロイ
-* 例3. [website](https://github.com/cloudnativedaysjp/website/tree/main/.github/workflows) : [`AWS Amplify` GitHub App](https://github.com/apps/aws-amplify-ap-northeast-1) により自動でデプロイされるため、デプロイ用の Action は存在しない
+* 例1. [cloudnativedaysjp/seaman](https://github.com/cloudnativedaysjp/seaman/blob/main/.github/workflows/gitops-prd.yml)
+    * dreamkast-infra リポジトリのマニフェスト更新
+* 例2. [cloudnativedaysjp/dreamkast-function](https://github.com/cloudnativedaysjp/dreamkast-functions/blob/main/.github/workflows/deploy-prd.yml)
+    * AWS CDK を用いてデプロイ
+* 例3. [cloudnativedaysjp/website](https://github.com/cloudnativedaysjp/website/tree/main/.github/workflows)
+    * [`AWS Amplify` GitHub App](https://github.com/apps/aws-amplify-ap-northeast-1) により自動でデプロイされるため、デプロイ用の Action は存在しない
