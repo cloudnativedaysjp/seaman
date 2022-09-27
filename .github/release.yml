@@ -3,9 +3,9 @@ changelog:
     labels:
       - release/*
   categories:
-    - title: What's Changed
-      labels:
-        - "*"
-    - title: Update dependencies
+    - title: Update dependencies ♻
       labels:
         - dependencies
+    - title: Other Changes 💫
+      labels:
+        - "*"
