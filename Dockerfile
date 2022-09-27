@@ -8,7 +8,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags osusergo,netgo -a -o seaman .
 
 ### runner ###
-FROM alpine:3.13.6
+FROM alpine:3.16.2
 WORKDIR /
 RUN apk add -u git
 COPY --from=builder /workspace/seaman .
