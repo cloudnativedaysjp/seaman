@@ -1,11 +1,11 @@
 changelog:
   exclude:
     labels:
-      - release/*
+      - "release/*"
   categories:
-    - title: Update dependencies ♻
+    - title: ♻ Update dependencies
       labels:
-        - dependencies
-    - title: Other Changes 💫
+        - "dependencies"
+    - title: 💫 Other Changes
       labels:
         - "*"
