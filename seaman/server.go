@@ -4,16 +4,17 @@ import (
 	"log"
 	"os"
 
+	"github.com/go-logr/zapr"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 	"go.uber.org/zap"
 
+	"github.com/cloudnativedaysjp/seaman/seaman/api"
 	"github.com/cloudnativedaysjp/seaman/seaman/controller"
-	"github.com/cloudnativedaysjp/seaman/seaman/dto"
-	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/gitcommand"
-	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/githubapi"
-	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infrastructure/slack"
+	"github.com/cloudnativedaysjp/seaman/seaman/infra/gitcommand"
+	"github.com/cloudnativedaysjp/seaman/seaman/infra/githubapi"
+	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infra/slack"
 	"github.com/cloudnativedaysjp/seaman/seaman/middleware"
 )
 
@@ -44,10 +45,11 @@ func Run(conf *Config) error {
 	// setup logger
 	zapConf := zap.NewProductionConfig()
 	zapConf.DisableStacktrace = true // due to output wrapped error in errorVerbose
-	logger, err := zapConf.Build()
+	zapLogger, err := zapConf.Build()
 	if err != nil {
 		return err
 	}
+	logger := zapr.NewLogger(zapLogger)
 
 	// setup some instances
 	slackDriverFactory := infra_slack.NewSlackDriverFactory()
@@ -65,22 +67,22 @@ func Run(conf *Config) error {
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(
 				c.SelectRepository,
-				middleware.MiddlewareMessagePrefixIs{Prefix: "release"},
-				middleware.MiddlewareHelpMessage{
+				middleware.MessagePrefixIs{Prefix: "release"},
+				middleware.HelpMessage{
 					Prefix: "release",
 					URL:    "https://github.com/cloudnativedaysjp/seaman/blob/main/docs/release.md",
 				},
 			))
 		socketmodeHandler.HandleInteractionBlockAction(
-			dto.ActIdRelease_SelectedRepository, c.SelectReleaseLevel)
+			api.ActIdRelease_SelectedRepository, c.SelectReleaseLevel)
 		socketmodeHandler.HandleInteractionBlockAction(
-			dto.ActIdRelease_SelectedLevelMajor, c.SelectConfirmation)
+			api.ActIdRelease_SelectedLevelMajor, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
-			dto.ActIdRelease_SelectedLevelMinor, c.SelectConfirmation)
+			api.ActIdRelease_SelectedLevelMinor, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
-			dto.ActIdRelease_SelectedLevelPatch, c.SelectConfirmation)
+			api.ActIdRelease_SelectedLevelPatch, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
-			dto.ActIdRelease_OK, c.CreatePullRequestForRelease)
+			api.ActIdRelease_OK, c.CreatePullRequestForRelease)
 	}
 	{ // common (THIS MUST BE DECLARED AT THE END)
 		c := controller.NewCommonController(logger,
@@ -89,10 +91,10 @@ func Run(conf *Config) error {
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(
 				c.ShowCommands,
-				middleware.MiddlewareMessagePrefixIs{Prefix: "help"},
+				middleware.MessagePrefixIs{Prefix: "help"},
 			))
 		socketmodeHandler.HandleInteractionBlockAction(
-			dto.ActIdCommon_Cancel, c.InteractionCancel)
+			api.ActIdCommon_Cancel, c.InteractionCancel)
 	}
 
 	if err := socketmodeHandler.RunEventLoop(); err != nil {

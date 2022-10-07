@@ -6,7 +6,7 @@ import (
 
 	"github.com/slack-go/slack"
 
-	"github.com/cloudnativedaysjp/seaman/seaman/dto"
+	"github.com/cloudnativedaysjp/seaman/seaman/api"
 )
 
 func ReleaseListRepo(repoUrls []string) slack.Msg {
@@ -52,7 +52,7 @@ func releaseListRepo(repoUrls []string) (slack.Msg, error) {
 										"type": "plain_text",
 										"text": "Select an item",
 									},
-									"action_id": dto.ActIdRelease_SelectedRepository,
+									"action_id": api.ActIdRelease_SelectedRepository,
 									"options":   options,
 								},
 								map[string]interface{}{
@@ -61,7 +61,7 @@ func releaseListRepo(repoUrls []string) (slack.Msg, error) {
 										"type": "plain_text",
 										"text": "Cancel",
 									},
-									"action_id": dto.ActIdCommon_Cancel,
+									"action_id": api.ActIdCommon_Cancel,
 									"style":     "danger",
 								},
 							},
@@ -73,12 +73,12 @@ func releaseListRepo(repoUrls []string) (slack.Msg, error) {
 	)
 }
 
-func ReleaseListLevel(orgRepo dto.OrgRepo) slack.Msg {
+func ReleaseListLevel(orgRepo api.OrgRepo) slack.Msg {
 	result, _ := releaseListLevel(orgRepo)
 	return result
 }
 
-func releaseListLevel(orgRepo dto.OrgRepo) (slack.Msg, error) {
+func releaseListLevel(orgRepo api.OrgRepo) (slack.Msg, error) {
 	return castFromMapToMsg(
 		map[string]interface{}{
 			"attachments": []interface{}{
@@ -99,28 +99,28 @@ func releaseListLevel(orgRepo dto.OrgRepo) (slack.Msg, error) {
 									"type": "button",
 									"text": map[string]interface{}{
 										"type": "plain_text",
-										"text": dto.CallbackValueRelease_VersionMajor,
+										"text": api.CallbackValueRelease_VersionMajor,
 									},
-									"action_id": dto.ActIdRelease_SelectedLevelMajor,
-									"value":     orgRepo.WithLevel(dto.CallbackValueRelease_VersionMajor).String(),
+									"action_id": api.ActIdRelease_SelectedLevelMajor,
+									"value":     orgRepo.WithLevel(api.CallbackValueRelease_VersionMajor).String(),
 								},
 								map[string]interface{}{
 									"type": "button",
 									"text": map[string]interface{}{
-										"text": dto.CallbackValueRelease_VersionMinor,
+										"text": api.CallbackValueRelease_VersionMinor,
 										"type": "plain_text",
 									},
-									"action_id": dto.ActIdRelease_SelectedLevelMinor,
-									"value":     orgRepo.WithLevel(dto.CallbackValueRelease_VersionMinor).String(),
+									"action_id": api.ActIdRelease_SelectedLevelMinor,
+									"value":     orgRepo.WithLevel(api.CallbackValueRelease_VersionMinor).String(),
 								},
 								map[string]interface{}{
 									"type": "button",
 									"text": map[string]interface{}{
 										"type": "plain_text",
-										"text": dto.CallbackValueRelease_VersionPatch,
+										"text": api.CallbackValueRelease_VersionPatch,
 									},
-									"action_id": dto.ActIdRelease_SelectedLevelPatch,
-									"value":     orgRepo.WithLevel(dto.CallbackValueRelease_VersionPatch).String(),
+									"action_id": api.ActIdRelease_SelectedLevelPatch,
+									"value":     orgRepo.WithLevel(api.CallbackValueRelease_VersionPatch).String(),
 								},
 								map[string]interface{}{
 									"type": "button",
@@ -128,7 +128,7 @@ func releaseListLevel(orgRepo dto.OrgRepo) (slack.Msg, error) {
 										"type": "plain_text",
 										"text": "Cancel",
 									},
-									"action_id": dto.ActIdCommon_Cancel,
+									"action_id": api.ActIdCommon_Cancel,
 									"style":     "danger",
 								},
 							},
@@ -140,12 +140,12 @@ func releaseListLevel(orgRepo dto.OrgRepo) (slack.Msg, error) {
 	)
 }
 
-func ReleaseConfirmation(orgRepoLevel dto.OrgRepoLevel) slack.Msg {
+func ReleaseConfirmation(orgRepoLevel api.OrgRepoLevel) slack.Msg {
 	result, _ := releaseConfirmation(orgRepoLevel)
 	return result
 }
 
-func releaseConfirmation(orgRepoLevel dto.OrgRepoLevel) (slack.Msg, error) {
+func releaseConfirmation(orgRepoLevel api.OrgRepoLevel) (slack.Msg, error) {
 	org := orgRepoLevel.Org()
 	repo := orgRepoLevel.Repo()
 	level := orgRepoLevel.Level()
@@ -172,7 +172,7 @@ func releaseConfirmation(orgRepoLevel dto.OrgRepoLevel) (slack.Msg, error) {
 									"type": "plain_text",
 									"text": "OK",
 								},
-								"action_id": dto.ActIdRelease_OK,
+								"action_id": api.ActIdRelease_OK,
 								"value":     orgRepoLevel.String(),
 							},
 							map[string]interface{}{
@@ -181,7 +181,7 @@ func releaseConfirmation(orgRepoLevel dto.OrgRepoLevel) (slack.Msg, error) {
 									"type": "plain_text",
 									"text": "Cancel",
 								},
-								"action_id": dto.ActIdCommon_Cancel,
+								"action_id": api.ActIdCommon_Cancel,
 								"style":     "danger",
 							},
 						},
@@ -218,12 +218,12 @@ func releaseProcessing() (slack.Msg, error) {
 `, colorLightGray))
 }
 
-func ReleaseDisplayPrLink(orgRepoLevel dto.OrgRepoLevel, prNumber int) slack.Msg {
+func ReleaseDisplayPrLink(orgRepoLevel api.OrgRepoLevel, prNumber int) slack.Msg {
 	result, _ := releaseDisplayPrLink(orgRepoLevel, prNumber)
 	return result
 }
 
-func releaseDisplayPrLink(orgRepoLevel dto.OrgRepoLevel, prNumber int) (slack.Msg, error) {
+func releaseDisplayPrLink(orgRepoLevel api.OrgRepoLevel, prNumber int) (slack.Msg, error) {
 	org := orgRepoLevel.Org()
 	repo := orgRepoLevel.Repo()
 	level := orgRepoLevel.Level()

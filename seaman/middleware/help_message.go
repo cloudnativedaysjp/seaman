@@ -7,12 +7,12 @@ import (
 	"github.com/slack-go/slack/socketmode"
 )
 
-type MiddlewareHelpMessage struct {
+type HelpMessage struct {
 	Prefix string
 	URL    string
 }
 
-func (m MiddlewareHelpMessage) Handle(next socketmode.SocketmodeHandlerFunc) socketmode.SocketmodeHandlerFunc {
+func (m HelpMessage) Handle(next socketmode.SocketmodeHandlerFunc) socketmode.SocketmodeHandlerFunc {
 	if Subcommands.Exists(m.Prefix) {
 		panic(fmt.Sprintf(`subcommand "%s" has already been registered`, m.Prefix))
 	}
@@ -24,7 +24,7 @@ func (m MiddlewareHelpMessage) Handle(next socketmode.SocketmodeHandlerFunc) soc
 	}
 }
 
-// subcommands is recorded by MiddlewareHelpMessage
+// subcommands is recorded by HelpMessage
 type subcommands map[string]string
 
 var (

@@ -7,11 +7,11 @@ import (
 	"github.com/slack-go/slack/socketmode"
 )
 
-type MiddlewareMessagePrefixIs struct {
+type MessagePrefixIs struct {
 	Prefix string
 }
 
-func (m MiddlewareMessagePrefixIs) Handle(next socketmode.SocketmodeHandlerFunc) socketmode.SocketmodeHandlerFunc {
+func (m MessagePrefixIs) Handle(next socketmode.SocketmodeHandlerFunc) socketmode.SocketmodeHandlerFunc {
 	// this middleware is intended to be called only incoming slackevents.AppMention.
 	// So call panic() if triggered by other incoming.
 	panicF := func() {

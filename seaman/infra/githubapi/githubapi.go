@@ -13,7 +13,6 @@ type GitHubApiIface interface {
 	HealthCheck() error
 	CreatePullRequest(ctx context.Context, org, repo, headBranch, baseBranch, title, body string) (prNum int, err error)
 	LabelPullRequest(ctx context.Context, org, repo string, prNum int, label string) error
-	MergePullRequest(ctx context.Context, org, repo string, prNum int) error
 	DeleteBranch(ctx context.Context, org, repo, headBranch string) error
 }
 
@@ -92,29 +91,6 @@ func (g *GitHubApiDriver) LabelPullRequest(ctx context.Context, org, repo string
 	if err := client.Mutate(ctx, &mutationLabelPR, githubv4.UpdatePullRequestInput{
 		PullRequestID: prId,
 		LabelIDs:      &[]githubv4.ID{labelId},
-	}, nil); err != nil {
-		return xerrors.Errorf("message: %w", err)
-	}
-	return nil
-}
-
-func (g *GitHubApiDriver) MergePullRequest(ctx context.Context, org, repo string, prNum int) error {
-	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
-
-	prId, err := g.getPullRequestId(ctx, org, repo, prNum)
-	if err != nil {
-		return xerrors.Errorf("message: %w", err)
-	}
-
-	var mutationMergePR struct {
-		MergePullRequest struct {
-			PullRequest struct {
-				ResourcePath githubv4.URI
-			}
-		} `graphql:"mergePullRequest(input:$input)"`
-	}
-	if err := client.Mutate(ctx, &mutationMergePR, githubv4.MergePullRequestInput{
-		PullRequestID: prId,
 	}, nil); err != nil {
 		return xerrors.Errorf("message: %w", err)
 	}

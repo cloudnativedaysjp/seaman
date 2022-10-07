@@ -4,25 +4,23 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	"github.com/go-logr/zapr"
 	"github.com/slack-go/slack"
-	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
-	"go.uber.org/zap"
 
-	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infrastructure/slack"
+	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infra/slack"
+	"github.com/cloudnativedaysjp/seaman/seaman/utils"
 	"github.com/cloudnativedaysjp/seaman/seaman/view"
 )
 
 type CommonController struct {
 	slackFactory infra_slack.SlackDriverFactoryIface
-	log          *zap.Logger
+	log          logr.Logger
 
 	subcommands map[string]string
 }
 
 func NewCommonController(
-	logger *zap.Logger,
+	logger logr.Logger,
 	slackFactory infra_slack.SlackDriverFactoryIface,
 	subcommands map[string]string,
 ) *CommonController {
@@ -30,15 +28,17 @@ func NewCommonController(
 }
 
 func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-	// this handler is intended to be called by only incoming slackevents.AppMention.
-	// So ignore validation of casting.
-	ev := evt.Data.(slackevents.EventsAPIEvent).InnerEvent.Data.(*slackevents.AppMentionEvent)
+	logger := c.log
+	ev, err := getAppMentionEvent(evt)
+	if err != nil {
+		logger.Error(err, "failed to get AppMentionEvent")
+		return
+	}
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
 	// init logger & context
-	logger := zapr.NewLogger(c.log.With(zap.String("messageTs", messageTs)))
-	ctx := logr.NewContext(context.Background(), logger)
+	logger = logger.WithValues("messageTs", messageTs)
+	ctx := utils.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -64,8 +64,8 @@ func (c *CommonController) InteractionCancel(evt *socketmode.Event, client *sock
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
 	// init logger & context
-	logger := zapr.NewLogger(c.log.With(zap.String("messageTs", messageTs)))
-	ctx := logr.NewContext(context.Background(), logger)
+	logger := c.log.WithValues("messageTs", messageTs)
+	ctx := utils.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {

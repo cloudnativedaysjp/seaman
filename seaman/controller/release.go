@@ -4,18 +4,17 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	"github.com/go-logr/zapr"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
-	"go.uber.org/zap"
 	"golang.org/x/xerrors"
 
-	"github.com/cloudnativedaysjp/seaman/seaman/dto"
-	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/gitcommand"
-	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/githubapi"
-	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infrastructure/slack"
+	"github.com/cloudnativedaysjp/seaman/seaman/api"
+	"github.com/cloudnativedaysjp/seaman/seaman/infra/gitcommand"
+	"github.com/cloudnativedaysjp/seaman/seaman/infra/githubapi"
+	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infra/slack"
 	"github.com/cloudnativedaysjp/seaman/seaman/service"
+	"github.com/cloudnativedaysjp/seaman/seaman/utils"
 	"github.com/cloudnativedaysjp/seaman/seaman/view"
 )
 
@@ -27,13 +26,13 @@ type Target struct {
 type ReleaseController struct {
 	slackFactory infra_slack.SlackDriverFactoryIface
 	service      *service.ReleaseService
-	log          *zap.Logger
+	log          logr.Logger
 
 	targets []Target
 }
 
 func NewReleaseController(
-	logger *zap.Logger,
+	logger logr.Logger,
 	slackFactory infra_slack.SlackDriverFactoryIface,
 	gitcommand gitcommand.GitCommandIface,
 	githubapi githubapi.GitHubApiIface,
@@ -51,8 +50,8 @@ func (c *ReleaseController) SelectRepository(evt *socketmode.Event, client *sock
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
 	// init logger & context
-	logger := zapr.NewLogger(c.log.With(zap.String("messageTs", messageTs)))
-	ctx := logr.NewContext(context.Background(), logger)
+	logger := c.log.WithValues("messageTs", messageTs)
+	ctx := utils.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -81,15 +80,15 @@ func (c *ReleaseController) SelectReleaseLevel(evt *socketmode.Event, client *so
 	messageTs := interaction.Container.MessageTs
 	callbackValue := interaction.ActionCallback.BlockActions[0].SelectedOption.Value
 	// init logger & context
-	logger := zapr.NewLogger(c.log.With(zap.String("messageTs", messageTs)))
-	ctx := logr.NewContext(context.Background(), logger)
+	logger := c.log.WithValues("messageTs", messageTs)
+	ctx := utils.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "failed to initialize Slack client")
 	}
 
-	orgRepo, err := dto.NewOrgRepo(callbackValue)
+	orgRepo, err := api.NewOrgRepo(callbackValue)
 	if err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "invalid callback value",
 			"callbackValue", interaction.ActionCallback.BlockActions[0].Value)
@@ -112,8 +111,8 @@ func (c *ReleaseController) SelectConfirmation(evt *socketmode.Event, client *so
 	messageTs := interaction.Container.MessageTs
 	callbackValue := interaction.ActionCallback.BlockActions[0].Value
 	// init logger & context
-	logger := zapr.NewLogger(c.log.With(zap.String("messageTs", messageTs)))
-	ctx := logr.NewContext(context.Background(), logger)
+	logger := c.log.WithValues("messageTs", messageTs)
+	ctx := utils.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -121,7 +120,7 @@ func (c *ReleaseController) SelectConfirmation(evt *socketmode.Event, client *so
 		return
 	}
 
-	orgRepoLevel, err := dto.NewOrgRepoLevel(callbackValue)
+	orgRepoLevel, err := api.NewOrgRepoLevel(callbackValue)
 	if err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "invalid callback value",
 			"callbackValue", interaction.ActionCallback.BlockActions[0].Value)
@@ -146,8 +145,8 @@ func (c *ReleaseController) CreatePullRequestForRelease(evt *socketmode.Event, c
 	messageTs := interaction.Container.MessageTs
 	callbackValue := interaction.ActionCallback.BlockActions[0].Value
 	// init logger & context
-	logger := zapr.NewLogger(c.log.With(zap.String("messageTs", messageTs)))
-	ctx := logr.NewContext(context.Background(), logger)
+	logger := c.log.WithValues("messageTs", messageTs)
+	ctx := utils.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -155,7 +154,7 @@ func (c *ReleaseController) CreatePullRequestForRelease(evt *socketmode.Event, c
 		return
 	}
 
-	orgRepoLevel, err := dto.NewOrgRepoLevel(callbackValue)
+	orgRepoLevel, err := api.NewOrgRepoLevel(callbackValue)
 	if err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "invalid callback value",
 			"callbackValue", interaction.ActionCallback.BlockActions[0].Value)

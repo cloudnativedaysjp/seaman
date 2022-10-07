@@ -1,8 +1,21 @@
-package dto
+package api
 
 import (
 	"fmt"
 	"strings"
+)
+
+const (
+	// Action IDs
+	ActIdRelease_SelectedRepository = "release_selected_repo"
+	ActIdRelease_SelectedLevelMajor = "release_selected_level_major"
+	ActIdRelease_SelectedLevelMinor = "release_selected_level_minor"
+	ActIdRelease_SelectedLevelPatch = "release_selected_level_patch"
+	ActIdRelease_OK                 = "release_ok"
+	// Callback Values
+	CallbackValueRelease_VersionMajor = "release/major"
+	CallbackValueRelease_VersionMinor = "release/minor"
+	CallbackValueRelease_VersionPatch = "release/patch"
 )
 
 type OrgRepo struct {
