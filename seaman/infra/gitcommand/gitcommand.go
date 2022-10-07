@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen -package mock -source=gitcommand.go -destination=mock/gitcommand.go
+
 package gitcommand
 
 import (
@@ -11,7 +13,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type GitCommandIface interface {
+type GitCommandClient interface {
 	HealthCheck() (err error)
 	Clone(ctx context.Context, org, repo string) (string, error)
 	SwitchNewBranch(ctx context.Context, dirPath, branch string) error
@@ -20,25 +22,25 @@ type GitCommandIface interface {
 	Remove(ctx context.Context, dir string) error
 }
 
-type GitCommandDriver struct {
+type GitCommandClientImpl struct {
 	user  string
 	email string
 	token string
 }
 
-func NewGitCommandDriver(user, token string) *GitCommandDriver {
-	return &GitCommandDriver{user, fmt.Sprintf("%s@users.noreply.github.com", user), token}
+func NewGitCommandClientImpl(user, token string) *GitCommandClientImpl {
+	return &GitCommandClientImpl{user, fmt.Sprintf("%s@users.noreply.github.com", user), token}
 }
 
 var (
 	baseURL = `https://%s:%s@github.com`
 )
 
-func (g *GitCommandDriver) HealthCheck() (err error) {
+func (g *GitCommandClientImpl) HealthCheck() (err error) {
 	return nil
 }
 
-func (g *GitCommandDriver) Clone(ctx context.Context, org, repo string) (string, error) {
+func (g *GitCommandClientImpl) Clone(ctx context.Context, org, repo string) (string, error) {
 	downloadDir := fmt.Sprintf("/tmp/%s", filepath.Base(repo))
 	cmd := exec.CommandContext(ctx, "git", "clone", "--depth", "1",
 		strings.Join([]string{fmt.Sprintf(baseURL, g.user, g.token), org, repo}, "/"), // https://<user>:<token>@github.com/<org>/<repo>
@@ -49,7 +51,7 @@ func (g *GitCommandDriver) Clone(ctx context.Context, org, repo string) (string,
 	return downloadDir, nil
 }
 
-func (g *GitCommandDriver) SwitchNewBranch(ctx context.Context, dirPath, branch string) error {
+func (g *GitCommandClientImpl) SwitchNewBranch(ctx context.Context, dirPath, branch string) error {
 	cmd := exec.CommandContext(ctx, "git", "switch", "-c", branch)
 	cmd.Dir = dirPath
 	if _, err := cmd.Output(); err != nil {
@@ -58,7 +60,7 @@ func (g *GitCommandDriver) SwitchNewBranch(ctx context.Context, dirPath, branch 
 	return nil
 }
 
-func (g *GitCommandDriver) CommitAll(ctx context.Context, dirPath, commitMsg string) error {
+func (g *GitCommandClientImpl) CommitAll(ctx context.Context, dirPath, commitMsg string) error {
 	cmd := exec.CommandContext(ctx, "git", "config", "user.name", g.user)
 	cmd.Dir = dirPath
 	if _, err := cmd.Output(); err != nil {
@@ -82,7 +84,7 @@ func (g *GitCommandDriver) CommitAll(ctx context.Context, dirPath, commitMsg str
 	return nil
 }
 
-func (g *GitCommandDriver) Push(ctx context.Context, dirPath string) error {
+func (g *GitCommandClientImpl) Push(ctx context.Context, dirPath string) error {
 	cmd := exec.CommandContext(ctx, "git", "push", "origin", "HEAD")
 	cmd.Dir = dirPath
 	if _, err := cmd.Output(); err != nil {
@@ -91,7 +93,7 @@ func (g *GitCommandDriver) Push(ctx context.Context, dirPath string) error {
 	return nil
 }
 
-func (g *GitCommandDriver) Remove(ctx context.Context, dir string) error {
+func (g *GitCommandClientImpl) Remove(ctx context.Context, dir string) error {
 	if err := os.RemoveAll(dir); err != nil {
 		return xerrors.Errorf("message: %w", err)
 	}

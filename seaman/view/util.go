@@ -7,6 +7,13 @@ import (
 	"github.com/slack-go/slack"
 )
 
+const (
+	colorLightGray   = "#d3d3d3"
+	colorCrimson     = "#dc143c"
+	colorDeepSkyBlue = "#00bfff"
+	colorHhaki       = "#f0e68c"
+)
+
 func castFromMapToMsg(m map[string]interface{}) (slack.Msg, error) {
 	b, err := json.Marshal(m)
 	if err != nil {

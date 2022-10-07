@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen -package mock -source=githubapi.go -destination=mock/githubapi.go
+
 package githubapi
 
 import (
@@ -9,26 +11,25 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type GitHubApiIface interface {
+type GitHubApiClient interface {
 	HealthCheck() error
 	CreatePullRequest(ctx context.Context, org, repo, headBranch, baseBranch, title, body string) (prNum int, err error)
 	LabelPullRequest(ctx context.Context, org, repo string, prNum int, label string) error
-	MergePullRequest(ctx context.Context, org, repo string, prNum int) error
 	DeleteBranch(ctx context.Context, org, repo, headBranch string) error
 }
 
-type GitHubApiDriver struct {
+type GitHubApiClientImpl struct {
 	tokenSource oauth2.TokenSource
 }
 
-func NewGitHubApiDriver(token string) *GitHubApiDriver {
+func NewGitHubApiClientImpl(token string) GitHubApiClient {
 	src := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
-	return &GitHubApiDriver{src}
+	return &GitHubApiClientImpl{src}
 }
 
-func (g *GitHubApiDriver) HealthCheck() error {
+func (g *GitHubApiClientImpl) HealthCheck() error {
 	ctx := context.Background()
 	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
 	var q struct {
@@ -42,7 +43,7 @@ func (g *GitHubApiDriver) HealthCheck() error {
 	return nil
 }
 
-func (g *GitHubApiDriver) CreatePullRequest(ctx context.Context, org, repo, headBranch, baseBranch, title, body string) (prNum int, err error) {
+func (g *GitHubApiClientImpl) CreatePullRequest(ctx context.Context, org, repo, headBranch, baseBranch, title, body string) (prNum int, err error) {
 	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
 
 	repoId, err := g.getRepositoryId(ctx, org, repo)
@@ -70,7 +71,7 @@ func (g *GitHubApiDriver) CreatePullRequest(ctx context.Context, org, repo, head
 	return mutationCreatePR.CreatePullRequest.PullRequest.Number, nil
 }
 
-func (g *GitHubApiDriver) LabelPullRequest(ctx context.Context, org, repo string, prNum int, label string) error {
+func (g *GitHubApiClientImpl) LabelPullRequest(ctx context.Context, org, repo string, prNum int, label string) error {
 	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
 
 	prId, err := g.getPullRequestId(ctx, org, repo, prNum)
@@ -98,30 +99,7 @@ func (g *GitHubApiDriver) LabelPullRequest(ctx context.Context, org, repo string
 	return nil
 }
 
-func (g *GitHubApiDriver) MergePullRequest(ctx context.Context, org, repo string, prNum int) error {
-	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
-
-	prId, err := g.getPullRequestId(ctx, org, repo, prNum)
-	if err != nil {
-		return xerrors.Errorf("message: %w", err)
-	}
-
-	var mutationMergePR struct {
-		MergePullRequest struct {
-			PullRequest struct {
-				ResourcePath githubv4.URI
-			}
-		} `graphql:"mergePullRequest(input:$input)"`
-	}
-	if err := client.Mutate(ctx, &mutationMergePR, githubv4.MergePullRequestInput{
-		PullRequestID: prId,
-	}, nil); err != nil {
-		return xerrors.Errorf("message: %w", err)
-	}
-	return nil
-}
-
-func (g *GitHubApiDriver) DeleteBranch(ctx context.Context, org, repo, headBranch string) error {
+func (g *GitHubApiClientImpl) DeleteBranch(ctx context.Context, org, repo, headBranch string) error {
 	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
 
 	id, err := g.getBranchId(ctx, org, repo, headBranch)
@@ -142,7 +120,7 @@ func (g *GitHubApiDriver) DeleteBranch(ctx context.Context, org, repo, headBranc
 	return nil
 }
 
-func (g *GitHubApiDriver) getRepositoryId(ctx context.Context, org, repo string) (githubv4.ID, error) {
+func (g *GitHubApiClientImpl) getRepositoryId(ctx context.Context, org, repo string) (githubv4.ID, error) {
 	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
 	var queryGetRepository struct {
 		Repository struct {
@@ -158,7 +136,7 @@ func (g *GitHubApiDriver) getRepositoryId(ctx context.Context, org, repo string)
 	return queryGetRepository.Repository.ID, nil
 }
 
-func (g *GitHubApiDriver) getPullRequestId(ctx context.Context, org, repo string, prNum int) (githubv4.ID, error) {
+func (g *GitHubApiClientImpl) getPullRequestId(ctx context.Context, org, repo string, prNum int) (githubv4.ID, error) {
 	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
 	var queryGetPullRequest struct {
 		Repository struct {
@@ -177,7 +155,7 @@ func (g *GitHubApiDriver) getPullRequestId(ctx context.Context, org, repo string
 	return queryGetPullRequest.Repository.PullRequest.ID, nil
 }
 
-func (g *GitHubApiDriver) getBranchId(ctx context.Context, org, repo, branch string) (githubv4.ID, error) {
+func (g *GitHubApiClientImpl) getBranchId(ctx context.Context, org, repo, branch string) (githubv4.ID, error) {
 	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
 	var queryGetBranchID struct {
 		Repository struct {
@@ -196,7 +174,7 @@ func (g *GitHubApiDriver) getBranchId(ctx context.Context, org, repo, branch str
 	return queryGetBranchID.Repository.Ref.ID, nil
 }
 
-func (g *GitHubApiDriver) getLabelId(ctx context.Context, org, repo, label string) (githubv4.ID, error) {
+func (g *GitHubApiClientImpl) getLabelId(ctx context.Context, org, repo, label string) (githubv4.ID, error) {
 	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
 	var queryGetLabel struct {
 		Repository struct {

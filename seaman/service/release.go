@@ -4,15 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-logr/logr"
-	"github.com/go-logr/zapr"
-	"go.uber.org/zap"
 	"golang.org/x/xerrors"
 
-	"github.com/cloudnativedaysjp/seaman/seaman/dto"
-	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/gitcommand"
-	"github.com/cloudnativedaysjp/seaman/seaman/infrastructure/githubapi"
-	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infrastructure/slack"
+	"github.com/cloudnativedaysjp/seaman/seaman/api"
+	"github.com/cloudnativedaysjp/seaman/seaman/infra/gitcommand"
+	"github.com/cloudnativedaysjp/seaman/seaman/infra/githubapi"
+	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infra/slack"
+	"github.com/cloudnativedaysjp/seaman/seaman/utils"
 	"github.com/cloudnativedaysjp/seaman/seaman/view"
 )
 
@@ -21,26 +19,23 @@ const (
 )
 
 type ReleaseService struct {
-	gitcommand gitcommand.GitCommandIface
-	githubapi  githubapi.GitHubApiIface
+	gitcommand gitcommand.GitCommandClient
+	githubapi  githubapi.GitHubApiClient
 }
 
 func NewReleaseService(
-	gitcommand gitcommand.GitCommandIface,
-	githubapi githubapi.GitHubApiIface,
+	gitcommand gitcommand.GitCommandClient,
+	githubapi githubapi.GitHubApiClient,
 ) *ReleaseService {
 	return &ReleaseService{gitcommand, githubapi}
 }
 
 func (s ReleaseService) CreatePullRequest(ctx context.Context,
-	sc infra_slack.SlackIface, channelId, messageTs string,
-	orgRepoLevel dto.OrgRepoLevel, targetBaseBranch string,
+	sc infra_slack.SlackClient, channelId, messageTs string,
+	orgRepoLevel api.OrgRepoLevel, targetBaseBranch string,
 ) error {
-	logger, err := logr.FromContext(ctx)
-	if err != nil {
-		zaplogger, _ := zap.NewDevelopment()
-		logger = zapr.NewLogger(zaplogger)
-	}
+	logger := utils.FromContext(ctx)
+
 	org := orgRepoLevel.Org()
 	repo := orgRepoLevel.Repo()
 	level := orgRepoLevel.Level()

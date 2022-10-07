@@ -3,7 +3,7 @@ package view
 import (
 	"testing"
 
-	"github.com/cloudnativedaysjp/seaman/seaman/dto"
+	"github.com/cloudnativedaysjp/seaman/seaman/api"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -148,7 +148,7 @@ func Test_releaseListLevel(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		orgRepo, _ := dto.NewOrgRepo("cloudnativedaysjp__dreamkast")
+		orgRepo, _ := api.NewOrgRepo("cloudnativedaysjp__dreamkast")
 		got, err := releaseListLevel(orgRepo)
 		if err != nil {
 			t.Errorf("error = %v", err)
@@ -207,7 +207,7 @@ func Test_releaseConfirmation(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		orgRepoLevel, _ := dto.NewOrgRepoLevel("cloudnativedaysjp__dreamkast__release/major")
+		orgRepoLevel, _ := api.NewOrgRepoLevel("cloudnativedaysjp__dreamkast__release/major")
 		got, err := releaseConfirmation(orgRepoLevel)
 		if err != nil {
 			t.Errorf("error = %v", err)
@@ -294,7 +294,7 @@ func Test_releaseDisplayPrLink(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		orgRepoLevel, _ := dto.NewOrgRepoLevel("cloudnativedaysjp__dreamkast__release/patch")
+		orgRepoLevel, _ := api.NewOrgRepoLevel("cloudnativedaysjp__dreamkast__release/patch")
 		got, err := releaseDisplayPrLink(orgRepoLevel, 1416)
 		if err != nil {
 			t.Errorf("error = %v", err)

@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen -package mock -source=slack.go -destination=mock/slack.go
+
 package slack
 
 import (
@@ -7,26 +9,26 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type SlackIface interface {
+type SlackClient interface {
 	PostMessage(ctx context.Context, channel string, msg slack.Msg) error
 	UpdateMessage(ctx context.Context, channel, ts string, msg slack.Msg) error
 }
 
-type SlackDriver struct {
+type SlackClientImpl struct {
 	client    slack.Client
 	botUserId string
 }
 
-func NewSlackDriver(client slack.Client) (*SlackDriver, error) {
+func NewSlackClientImpl(client slack.Client) (*SlackClientImpl, error) {
 	res, err := client.AuthTest()
 	if err != nil {
 		return nil, err
 	}
 
-	return &SlackDriver{client, res.UserID}, nil
+	return &SlackClientImpl{client, res.UserID}, nil
 }
 
-func (s *SlackDriver) PostMessage(ctx context.Context, channel string, msg slack.Msg) error {
+func (s *SlackClientImpl) PostMessage(ctx context.Context, channel string, msg slack.Msg) error {
 	_, _, err := s.client.PostMessageContext(ctx, channel,
 		slack.MsgOptionText(msg.Text, false),
 		slack.MsgOptionAttachments(msg.Attachments...),
@@ -38,7 +40,7 @@ func (s *SlackDriver) PostMessage(ctx context.Context, channel string, msg slack
 	return nil
 }
 
-func (s *SlackDriver) UpdateMessage(ctx context.Context, channel, ts string, msg slack.Msg) error {
+func (s *SlackClientImpl) UpdateMessage(ctx context.Context, channel, ts string, msg slack.Msg) error {
 	_, _, _, err := s.client.UpdateMessageContext(
 		ctx, channel, ts,
 		slack.MsgOptionText(msg.Text, false),
