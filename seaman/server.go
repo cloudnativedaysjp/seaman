@@ -52,9 +52,9 @@ func Run(conf *Config) error {
 	logger := zapr.NewLogger(zapLogger)
 
 	// setup some instances
-	slackDriverFactory := infra_slack.NewSlackDriverFactory()
-	githubApiDriver := githubapi.NewGitHubApiDriver(conf.GitHub.AccessToken)
-	gitCommandDriver := gitcommand.NewGitCommandDriver(conf.GitHub.Username, conf.GitHub.AccessToken)
+	slackClientFactory := infra_slack.NewSlackClientFactory()
+	githubApiClient := githubapi.NewGitHubApiClientImpl(conf.GitHub.AccessToken)
+	gitCommandClient := gitcommand.NewGitCommandClientImpl(conf.GitHub.Username, conf.GitHub.AccessToken)
 
 	{ // release
 		var targets []controller.Target
@@ -62,7 +62,7 @@ func Run(conf *Config) error {
 			targets = append(targets, controller.Target(target))
 		}
 		c := controller.NewReleaseController(logger,
-			slackDriverFactory, gitCommandDriver, githubApiDriver, targets)
+			slackClientFactory, gitCommandClient, githubApiClient, targets)
 
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(
@@ -86,7 +86,7 @@ func Run(conf *Config) error {
 	}
 	{ // common (THIS MUST BE DECLARED AT THE END)
 		c := controller.NewCommonController(logger,
-			slackDriverFactory, middleware.Subcommands.List())
+			slackClientFactory, middleware.Subcommands.List())
 
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(

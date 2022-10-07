@@ -13,7 +13,7 @@ import (
 )
 
 type CommonController struct {
-	slackFactory infra_slack.SlackDriverFactoryIface
+	slackFactory infra_slack.SlackClientFactory
 	log          logr.Logger
 
 	subcommands map[string]string
@@ -21,7 +21,7 @@ type CommonController struct {
 
 func NewCommonController(
 	logger logr.Logger,
-	slackFactory infra_slack.SlackDriverFactoryIface,
+	slackFactory infra_slack.SlackClientFactory,
 	subcommands map[string]string,
 ) *CommonController {
 	return &CommonController{slackFactory, logger, subcommands}

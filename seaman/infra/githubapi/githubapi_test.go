@@ -9,10 +9,10 @@ import (
 )
 
 func Test_GitHubApiDriver(t *testing.T) {
-	driver := NewGitHubApiDriver(os.Getenv("GITHUB_TOKEN"))
+	c := NewGitHubApiClient(os.Getenv("GITHUB_TOKEN"))
 
 	t.Run(`HealthCheck`, func(t *testing.T) {
-		err := driver.HealthCheck()
+		err := c.HealthCheck()
 		if err != nil {
 			t.Fatalf("error: %s", err)
 		}
@@ -27,18 +27,13 @@ func Test_GitHubApiDriver(t *testing.T) {
 		label := "bug"
 
 		// CreatePullRequest
-		prNum, err := driver.CreatePullRequest(ctx, org, repo, headBranch, baseBranch, "demo", "hoge\n`fuga`\n**piyo**")
+		prNum, err := c.CreatePullRequest(ctx, org, repo, headBranch, baseBranch, "demo", "hoge\n`fuga`\n**piyo**")
 		if err != nil {
 			t.Fatalf("error: %s", err)
 		}
 
 		// LabelPullRequest
-		if err := driver.LabelPullRequest(ctx, org, repo, prNum, label); err != nil {
-			t.Fatalf("error: %s", err)
-		}
-
-		// MergePullRequest
-		if err := driver.MergePullRequest(ctx, org, repo, prNum); err != nil {
+		if err := c.LabelPullRequest(ctx, org, repo, prNum, label); err != nil {
 			t.Fatalf("error: %s", err)
 		}
 	})

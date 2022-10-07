@@ -19,19 +19,19 @@ const (
 )
 
 type ReleaseService struct {
-	gitcommand gitcommand.GitCommandIface
-	githubapi  githubapi.GitHubApiIface
+	gitcommand gitcommand.GitCommandClient
+	githubapi  githubapi.GitHubApiClient
 }
 
 func NewReleaseService(
-	gitcommand gitcommand.GitCommandIface,
-	githubapi githubapi.GitHubApiIface,
+	gitcommand gitcommand.GitCommandClient,
+	githubapi githubapi.GitHubApiClient,
 ) *ReleaseService {
 	return &ReleaseService{gitcommand, githubapi}
 }
 
 func (s ReleaseService) CreatePullRequest(ctx context.Context,
-	sc infra_slack.SlackIface, channelId, messageTs string,
+	sc infra_slack.SlackClient, channelId, messageTs string,
 	orgRepoLevel api.OrgRepoLevel, targetBaseBranch string,
 ) error {
 	logger := utils.FromContext(ctx)

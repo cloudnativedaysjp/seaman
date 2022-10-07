@@ -24,7 +24,7 @@ type Target struct {
 }
 
 type ReleaseController struct {
-	slackFactory infra_slack.SlackDriverFactoryIface
+	slackFactory infra_slack.SlackClientFactory
 	service      *service.ReleaseService
 	log          logr.Logger
 
@@ -33,9 +33,9 @@ type ReleaseController struct {
 
 func NewReleaseController(
 	logger logr.Logger,
-	slackFactory infra_slack.SlackDriverFactoryIface,
-	gitcommand gitcommand.GitCommandIface,
-	githubapi githubapi.GitHubApiIface,
+	slackFactory infra_slack.SlackClientFactory,
+	gitcommand gitcommand.GitCommandClient,
+	githubapi githubapi.GitHubApiClient,
 	targets []Target,
 ) *ReleaseController {
 	service := service.NewReleaseService(gitcommand, githubapi)

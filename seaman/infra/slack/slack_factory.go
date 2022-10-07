@@ -2,16 +2,16 @@ package slack
 
 import "github.com/slack-go/slack"
 
-type SlackDriverFactoryIface interface {
-	New(client slack.Client) (SlackIface, error)
+type SlackClientFactory interface {
+	New(client slack.Client) (SlackClient, error)
 }
 
-type SlackDriverFactory struct{}
+type SlackClientFactoryImpl struct{}
 
-func NewSlackDriverFactory() *SlackDriverFactory {
-	return &SlackDriverFactory{}
+func NewSlackClientFactory() SlackClientFactory {
+	return &SlackClientFactoryImpl{}
 }
 
-func (f SlackDriverFactory) New(client slack.Client) (SlackIface, error) {
-	return NewSlackDriver(client)
+func (f SlackClientFactoryImpl) New(client slack.Client) (SlackClient, error) {
+	return NewSlackClientImpl(client)
 }
