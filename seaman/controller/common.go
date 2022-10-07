@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/socketmode"
 
 	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infra/slack"
@@ -28,16 +27,17 @@ func NewCommonController(
 }
 
 func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmode.Client) {
-	logger := c.log
+	client.Ack(*evt.Request)
+
 	ev, err := getAppMentionEvent(evt)
 	if err != nil {
-		logger.Error(err, "failed to get AppMentionEvent")
+		c.log.Error(err, "failed to get AppMentionEvent")
 		return
 	}
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
 	// init logger & context
-	logger = logger.WithValues("messageTs", messageTs)
+	logger := c.log.WithValues("messageTs", messageTs)
 	ctx := utils.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
@@ -58,9 +58,12 @@ func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmod
 
 func (c *CommonController) InteractionCancel(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
-	// this handler is intended to be called by only incoming slack.InteractionCallback.
-	// So ignore validation of casting.
-	interaction := evt.Data.(slack.InteractionCallback)
+
+	interaction, err := getInteractionCallback(evt)
+	if err != nil {
+		c.log.Error(err, "failed to get InteractionCallback")
+		return
+	}
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
 	// init logger & context

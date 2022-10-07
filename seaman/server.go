@@ -10,6 +10,7 @@ import (
 	"github.com/slack-go/slack/socketmode"
 	"go.uber.org/zap"
 
+	"github.com/cloudnativedaysjp/seaman/config"
 	"github.com/cloudnativedaysjp/seaman/seaman/api"
 	"github.com/cloudnativedaysjp/seaman/seaman/controller"
 	"github.com/cloudnativedaysjp/seaman/seaman/infra/gitcommand"
@@ -18,7 +19,7 @@ import (
 	"github.com/cloudnativedaysjp/seaman/seaman/middleware"
 )
 
-func Run(conf *Config) error {
+func Run(conf *config.Config) error {
 	// setup Slack Bot
 	var client *socketmode.Client
 	if conf.Debug {
@@ -83,6 +84,15 @@ func Run(conf *Config) error {
 			api.ActIdRelease_SelectedLevelPatch, c.SelectConfirmation)
 		socketmodeHandler.HandleInteractionBlockAction(
 			api.ActIdRelease_OK, c.CreatePullRequestForRelease)
+	}
+	{ // version
+		c := controller.NewVersionController(logger, slackClientFactory)
+		socketmodeHandler.HandleEvents(
+			slackevents.AppMention, middleware.MiddlewareSet(
+				c.ShowVersion,
+				middleware.MessagePrefixIs{Prefix: "version"},
+				middleware.HelpMessage{Prefix: "version"},
+			))
 	}
 	{ // common (THIS MUST BE DECLARED AT THE END)
 		c := controller.NewCommonController(logger,

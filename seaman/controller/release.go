@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	"github.com/slack-go/slack"
-	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 	"golang.org/x/xerrors"
 
@@ -44,9 +42,12 @@ func NewReleaseController(
 
 func (c *ReleaseController) SelectRepository(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
-	// this handler is intended to be called by only incoming slackevents.AppMention.
-	// So ignore validation of casting.
-	ev := evt.Data.(slackevents.EventsAPIEvent).InnerEvent.Data.(*slackevents.AppMentionEvent)
+
+	ev, err := getAppMentionEvent(evt)
+	if err != nil {
+		c.log.Error(err, "failed to get AppMentionEvent")
+		return
+	}
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
 	// init logger & context
@@ -73,9 +74,12 @@ func (c *ReleaseController) SelectRepository(evt *socketmode.Event, client *sock
 
 func (c *ReleaseController) SelectReleaseLevel(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
-	// this handler is intended to be called by only incoming slack.InteractionCallback.
-	// So ignore validation of casting.
-	interaction := evt.Data.(slack.InteractionCallback)
+
+	interaction, err := getInteractionCallback(evt)
+	if err != nil {
+		c.log.Error(err, "failed to get InteractionCallback")
+		return
+	}
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
 	callbackValue := interaction.ActionCallback.BlockActions[0].SelectedOption.Value
@@ -104,9 +108,12 @@ func (c *ReleaseController) SelectReleaseLevel(evt *socketmode.Event, client *so
 
 func (c *ReleaseController) SelectConfirmation(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
-	// this handler is intended to be called by only incoming slack.InteractionCallback.
-	// So ignore validation of casting.
-	interaction := evt.Data.(slack.InteractionCallback)
+
+	interaction, err := getInteractionCallback(evt)
+	if err != nil {
+		c.log.Error(err, "failed to get InteractionCallback")
+		return
+	}
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
 	callbackValue := interaction.ActionCallback.BlockActions[0].Value
@@ -138,9 +145,12 @@ func (c *ReleaseController) SelectConfirmation(evt *socketmode.Event, client *so
 
 func (c *ReleaseController) CreatePullRequestForRelease(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
-	// this handler is intended to be called by only incoming slack.InteractionCallback.
-	// So ignore validation of casting.
-	interaction := evt.Data.(slack.InteractionCallback)
+
+	interaction, err := getInteractionCallback(evt)
+	if err != nil {
+		c.log.Error(err, "failed to get InteractionCallback")
+		return
+	}
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
 	callbackValue := interaction.ActionCallback.BlockActions[0].Value

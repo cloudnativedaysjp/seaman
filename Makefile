@@ -1,7 +1,5 @@
-ifndef REGISTRY_BASE
-	REGISTRY_BASE = public.ecr.aws/f5j9d0q5/seaman
-endif
-
+VERSION ?= none
+REGISTRY_BASE ?= public.ecr.aws/f5j9d0q5/seaman
 
 ##@ General
 
@@ -25,7 +23,10 @@ help: ## Display this help.
 
 .PHONY: build-image
 build-image: ## build Docker image
-	docker build . -t $(REGISTRY_BASE)
+	docker build . \
+		--build-arg APP_VERSION=$(VERSION) \
+		--build-arg APP_COMMIT=$(shell git rev-parse --short HEAD) \
+		-t $(REGISTRY_BASE)
 
 .PHONY: push-image
 push-image: ## push Docker image

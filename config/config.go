@@ -1,4 +1,4 @@
-package seaman
+package config
 
 import (
 	"encoding/json"
