@@ -34,6 +34,10 @@ push-image: ## push Docker image
 
 ##@ Development
 
+.PHONY: generate
+generate: ## Generate code
+	go generate ./...
+
 .PHONY: fmt
 fmt: ## Run go fmt against code.
 	go fmt ./...

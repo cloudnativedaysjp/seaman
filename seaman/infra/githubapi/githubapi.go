@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen -package mock -source=githubapi.go -destination=mock/githubapi.go
+
 package githubapi
 
 import (

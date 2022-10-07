@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen -package mock -source=gitcommand.go -destination=mock/gitcommand.go
+
 package gitcommand
 
 import (

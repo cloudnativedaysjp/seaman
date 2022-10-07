@@ -1,3 +1,5 @@
+//go:generate go run github.com/golang/mock/mockgen -package mock -source=slack.go -destination=mock/slack.go
+
 package slack
 
 import (
