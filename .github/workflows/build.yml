@@ -26,11 +26,7 @@ jobs:
         with:
           registry-type: public
 
-      #
-      # For commit
-      #
       - name: Docker meta
-        if: ! startsWith( github.ref, 'refs/tags/v' )
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -38,8 +34,17 @@ jobs:
           tags: |
             type=sha,prefix=,format=long
             type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - id: get-tag
+        run: |
+          if [[ "${{ github.ref }}" =~ "^refs/tags/" ]]; then
+            echo "::set-output name=tag::$(echo ${{ github.ref }} | sed -e 's|^refs/tags/\(.*\)$|\1|g')"
+          else
+            echo "::set-output name=tag::none"
+          fi
+
       - name: Build
-        if: ! startsWith( github.ref, 'refs/tags/v' )
         uses: docker/build-push-action@v3
         with:
           context: ./
@@ -49,34 +54,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            APP_VERSION=none
+            APP_VERSION=${{ steps.get-tag.outputs.tag }}
             APP_COMMIT=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      #
-      # For tag
-      #
-      - name: Docker meta for push tag
-        if: startsWith( github.ref, 'refs/tags/v' )
-        id: meta-withtag
-        uses: docker/metadata-action@v4
-        with:
-          images: public.ecr.aws/f5j9d0q5/seaman
-          tags: type=semver,pattern={{version}}
-      - name: Build for push tag
-        if: startsWith( github.ref, 'refs/tags/v' )
-        uses: docker/build-push-action@v3
-        with:
-          context: ./
-          file: ./Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          push: true
-          tags: ${{ steps.meta-withtag.outputs.tags }}
-          labels: ${{ steps.meta-withtag.outputs.labels }}
-          build-args: |
-            APP_VERSION=${{ steps.meta-withtag.outputs.tags }}
-            APP_COMMIT=${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
