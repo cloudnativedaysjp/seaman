@@ -1,11 +1,20 @@
 ### builder ###
 FROM golang:1.19 as builder
+
 WORKDIR /workspace
+# Arguments
+ARG APP_VERSION
+ARG APP_COMMIT
+# Copy the Go Modules
 COPY go.mod go.mod
 COPY go.sum go.sum
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags osusergo,netgo -a -o seaman .
+# Build
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "\
+  -X github.com/cloudnativedaysjp/seaman/version.Version=${APP_VERSION} \
+  -X github.com/cloudnativedaysjp/seaman/version.Commit=${APP_COMMIT} \
+  " -tags osusergo,netgo -a -o seaman .
 
 ### runner ###
 FROM alpine:3.16.2
