@@ -35,10 +35,11 @@ func LoadConf(filename string) (*Config, error) {
 }
 
 type Config struct {
-	Debug   bool          `json:"debug"`
-	Slack   SlackConfig   `json:"slack" validate:"required"`
-	GitHub  GitHubConfig  `json:"github" validate:"required"`
-	Release ReleaseConfig `json:"release" validate:"required"`
+	Debug     bool            `json:"debug"`
+	Slack     SlackConfig     `json:"slack" validate:"required"`
+	GitHub    GitHubConfig    `json:"github" validate:"required"`
+	Release   ReleaseConfig   `json:"release" validate:"required"`
+	Broadcast BroadcastConfig `json:"broadcast"`
 }
 
 // for each external service
@@ -62,4 +63,8 @@ type ReleaseConfig struct {
 type ReleaseTarget struct {
 	Url        string `json:"url" validate:"required"`
 	BaseBranch string `json:"baseBranch" default:"main"`
+}
+
+type BroadcastConfig struct {
+	EndpointUrl string `json:"endpointUrl"`
 }

@@ -69,6 +69,7 @@ func (c *ReleaseController) SelectRepository(evt *socketmode.Event, client *sock
 	); err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message")
 		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
+		return
 	}
 }
 
@@ -90,6 +91,7 @@ func (c *ReleaseController) SelectReleaseLevel(evt *socketmode.Event, client *so
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "failed to initialize Slack client")
+		return
 	}
 
 	orgRepo, err := api.NewOrgRepo(callbackValue)
