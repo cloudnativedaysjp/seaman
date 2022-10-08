@@ -11,8 +11,8 @@
       "groupName": "all minor, patch, or digest dependencies on Go",
     },
     {
-      "matchManagers": ["dockerfile"],
-      "groupName": "all dependencies on Dockerfile",
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "groupName": "all dependencies on Docker",
     },
     {
       "matchManagers": ["github-actions"],
