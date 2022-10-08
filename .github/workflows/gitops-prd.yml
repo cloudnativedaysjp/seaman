@@ -27,10 +27,18 @@ jobs:
           path: dreamkast-infra
           token: ${{ steps.generate_token.outputs.token }}
 
+      - id: get-tag
+        run: |
+          if [[ "${{ github.ref }}" =~ ^refs/tags/ ]]; then
+            echo "::set-output name=tag::$(echo ${{ github.ref }} | sed -e 's|^refs/tags/v\(.*\)$|\1|g')"
+          else
+            echo "::set-output name=tag::none"
+          fi
+
       - name: Update Kubernetes manifests
         working-directory: dreamkast-infra/manifests/app/seaman
         run: |
-          kustomize edit set image public.ecr.aws/f5j9d0q5/seaman:${{ github.sha }}
+          kustomize edit set image public.ecr.aws/f5j9d0q5/seaman:${{ steps.get-tag.outputs.tag }}
 
       - name: Commit files
         working-directory: dreamkast-infra/
