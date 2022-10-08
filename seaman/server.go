@@ -85,6 +85,9 @@ func Run(conf *config.Config) error {
 		socketmodeHandler.HandleInteractionBlockAction(
 			api.ActIdRelease_OK, c.CreatePullRequestForRelease)
 	}
+	{ // broadcast
+		// TODO
+	}
 	{ // version
 		c := controller.NewVersionController(logger, slackClientFactory)
 		socketmodeHandler.HandleEvents(
