@@ -13,6 +13,7 @@ import (
 
 	pb "github.com/cloudnativedaysjp/cnd-operation-server/pkg/ws-proxy/schema"
 
+	"github.com/cloudnativedaysjp/seaman/seaman/api"
 	infra_cnd "github.com/cloudnativedaysjp/seaman/seaman/infra/cnd-operation-server"
 	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infra/slack"
 	"github.com/cloudnativedaysjp/seaman/seaman/utils"
@@ -21,7 +22,7 @@ import (
 
 type BroadcastController struct {
 	slackFactory   infra_slack.SlackClientFactory
-	cndSceneClient pb.TrackServiceClient
+	cndSceneClient pb.SceneServiceClient
 	cndTrackClient pb.TrackServiceClient
 	log            logr.Logger
 }
@@ -29,7 +30,7 @@ type BroadcastController struct {
 func NewBroadcastController(
 	logger logr.Logger,
 	slackFactory infra_slack.SlackClientFactory,
-	cndClient infra_cnd.CndWrapper,
+	cndClient *infra_cnd.CndWrapper,
 ) *BroadcastController {
 	return &BroadcastController{slackFactory, cndClient, cndClient, logger}
 }
@@ -69,14 +70,14 @@ func (c *BroadcastController) ListTrack(evt *socketmode.Event, client *socketmod
 	}
 }
 
-func (c *BroadcastController) DisableAutomation(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-	c.switchAutomation(evt, client, false)
-}
-
 func (c *BroadcastController) EnableAutomation(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
 	c.switchAutomation(evt, client, true)
+}
+
+func (c *BroadcastController) DisableAutomation(evt *socketmode.Event, client *socketmode.Client) {
+	client.Ack(*evt.Request)
+	c.switchAutomation(evt, client, false)
 }
 
 func (c *BroadcastController) switchAutomation(evt *socketmode.Event, client *socketmode.Client, enabled bool) {
@@ -137,6 +138,47 @@ func (c *BroadcastController) switchAutomation(evt *socketmode.Event, client *so
 	if err := sc.PostMessage(ctx, channelId, msg); err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message")
 		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
+		return
+	}
+}
+
+func (c *BroadcastController) UpdateSceneToNext(evt *socketmode.Event, client *socketmode.Client) {
+	client.Ack(*evt.Request)
+
+	interaction, err := getInteractionCallback(evt)
+	if err != nil {
+		c.log.Error(err, "failed to get InteractionCallback")
+		return
+	}
+	channelId := interaction.Container.ChannelID
+	messageTs := interaction.Container.MessageTs
+	callbackValue := interaction.ActionCallback.BlockActions[0].SelectedOption.Value
+	// init logger & context
+	logger := c.log.WithValues("messageTs", messageTs)
+	ctx := utils.IntoContext(context.Background(), logger)
+	// new client from factory
+	sc, err := c.slackFactory.New(client.Client)
+	if err != nil {
+		logger.Error(xerrors.Errorf("message: %w", err), "failed to initialize Slack client")
+	}
+
+	track, err := api.NewTrack(callbackValue)
+	if err != nil {
+		_ = sc.PostMessage(ctx, channelId, view.InvalidArguments(messageTs,
+			"callbackValue (trackId) must be integer"))
+		return
+	}
+
+	if _, err := c.cndSceneClient.MoveSceneToNext(ctx,
+		&pb.MoveSceneToNextRequest{TrackId: track.Id}); err != nil {
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
+		return
+	}
+
+	if err := sc.UpdateMessage(ctx, channelId, messageTs,
+		view.BroadcastMovedToNextScene(track)); err != nil {
+		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message: %v", err)
+		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
 		return
 	}
 }

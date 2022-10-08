@@ -9,3 +9,5 @@ release:
   targets:
   - url: https://github.com/ShotaKitazawa/kube-portal
     baseBranch: master
+broadcast:
+  endpointUrl: localhost:20080
