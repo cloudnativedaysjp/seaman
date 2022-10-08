@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	// Color
 	colorLightGray   = "#d3d3d3"
 	colorCrimson     = "#dc143c"
 	colorDeepSkyBlue = "#00bfff"
@@ -35,5 +36,8 @@ func castFromStringToMsg(s string) (slack.Msg, error) {
 }
 
 func replaceBackquote(s string) string {
-	return strings.ReplaceAll(s, "<backquote>", "`")
+	result := s
+	result = strings.ReplaceAll(result, "<backquote>", "`")
+	result = strings.ReplaceAll(result, "<bq>", "`")
+	return result
 }

@@ -50,6 +50,33 @@ func showCommands(commands map[string]string) (slack.Msg, error) {
 	)))
 }
 
+func InvalidArguments(messageTs, message string) slack.Msg {
+	result, _ := invalidArguments(messageTs, message)
+	return result
+}
+
+func invalidArguments(messageTs, message string) (slack.Msg, error) {
+	return castFromMapToMsg(
+		map[string]interface{}{
+			"attachments": []interface{}{
+				map[string]interface{}{
+					"color": colorCrimson,
+					"blocks": []interface{}{
+						map[string]interface{}{
+							"type": "section",
+							"text": map[string]interface{}{
+								"type": "mrkdwn",
+								"text": fmt.Sprintf("*InvalidArguments*\n"+
+									"%s (messageTs: `%s`)", message, messageTs),
+							},
+						},
+					},
+				},
+			},
+		},
+	)
+}
+
 func SomethingIsWrong(messageTs string) slack.Msg {
 	result, _ := somethingIsWrong(messageTs)
 	return result
