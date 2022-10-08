@@ -41,3 +41,7 @@ func replaceBackquote(s string) string {
 	result = strings.ReplaceAll(result, "<bq>", "`")
 	return result
 }
+
+func replaceNewLine(s string) string {
+	return strings.ReplaceAll(s, "\n", "\\n")
+}

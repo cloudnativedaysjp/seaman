@@ -26,6 +26,6 @@ func showVersion() (slack.Msg, error) {
 		}
 	]
 }
-`, version.Information(),
+`, replaceNewLine(version.Information()),
 	)))
 }
