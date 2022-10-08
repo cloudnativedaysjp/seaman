@@ -68,7 +68,7 @@ func (c *ReleaseController) SelectRepository(evt *socketmode.Event, client *sock
 		view.ReleaseListRepo(targetUrls),
 	); err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message")
-		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong("None"))
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
 	}
 }
 

@@ -43,7 +43,7 @@ func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmod
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
 		logger.Error(err, "failed to initialize Slack client")
-		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong("None"))
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
 		return
 	}
 
@@ -51,7 +51,35 @@ func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmod
 		view.ShowCommands(c.subcommands),
 	); err != nil {
 		logger.Error(err, "failed to post message")
-		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong("None"))
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
+		return
+	}
+}
+
+func (c *CommonController) ShowVersion(evt *socketmode.Event, client *socketmode.Client) {
+	client.Ack(*evt.Request)
+
+	ev, err := getAppMentionEvent(evt)
+	if err != nil {
+		c.log.Error(err, "failed to get AppMentionEvent")
+		return
+	}
+	channelId := ev.Channel
+	messageTs := ev.TimeStamp
+	// init logger & context
+	logger := c.log.WithValues("messageTs", messageTs)
+	ctx := utils.IntoContext(context.Background(), logger)
+	// new client from factory
+	sc, err := c.slackFactory.New(client.Client)
+	if err != nil {
+		logger.Error(err, "failed to initialize Slack client")
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
+		return
+	}
+
+	if err := sc.PostMessage(ctx, channelId, view.ShowVersion()); err != nil {
+		logger.Error(err, "failed to post message")
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
 		return
 	}
 }
