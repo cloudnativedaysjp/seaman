@@ -37,3 +37,7 @@ func castFromStringToMsg(s string) (slack.Msg, error) {
 func replaceBackquote(s string) string {
 	return strings.ReplaceAll(s, "<backquote>", "`")
 }
+
+func replaceNewLine(s string) string {
+	return strings.ReplaceAll(s, "\n", "\\n")
+}
