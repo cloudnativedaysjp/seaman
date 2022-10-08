@@ -68,11 +68,8 @@ func Run(conf *config.Config) error {
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(
 				c.SelectRepository,
-				middleware.MessagePrefixIs{Prefix: "release"},
-				middleware.HelpMessage{
-					Prefix: "release",
-					URL:    "https://github.com/cloudnativedaysjp/seaman/blob/main/docs/release.md",
-				},
+				middleware.RegisterCommand("release").
+					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/release.md"),
 			))
 		socketmodeHandler.HandleInteractionBlockAction(
 			api.ActIdRelease_SelectedRepository, c.SelectReleaseLevel)
@@ -88,23 +85,19 @@ func Run(conf *config.Config) error {
 	{ // broadcast
 		// TODO
 	}
-	{ // version
-		c := controller.NewVersionController(logger, slackClientFactory)
-		socketmodeHandler.HandleEvents(
-			slackevents.AppMention, middleware.MiddlewareSet(
-				c.ShowVersion,
-				middleware.MessagePrefixIs{Prefix: "version"},
-				middleware.HelpMessage{Prefix: "version"},
-			))
-	}
-	{ // common (THIS MUST BE DECLARED AT THE END)
+	{ // common
 		c := controller.NewCommonController(logger,
 			slackClientFactory, middleware.Subcommands.List())
 
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(
 				c.ShowCommands,
-				middleware.MessagePrefixIs{Prefix: "help"},
+				middleware.RegisterCommand("help"),
+			))
+		socketmodeHandler.HandleEvents(
+			slackevents.AppMention, middleware.MiddlewareSet(
+				c.ShowVersion,
+				middleware.RegisterCommand("version"),
 			))
 		socketmodeHandler.HandleInteractionBlockAction(
 			api.ActIdCommon_Cancel, c.InteractionCancel)
