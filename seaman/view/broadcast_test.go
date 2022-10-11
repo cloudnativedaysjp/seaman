@@ -51,3 +51,253 @@ func Test_broadcastListTrack(t *testing.T) {
 		}
 	})
 }
+
+func Test_BroadcastMovedToNextScene(t *testing.T) {
+	t.Run("test", func(t *testing.T) {
+		inputStr := `
+{
+	"blocks": [
+		{
+			"type": "divider"
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "Current Talk",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "plain_text",
+					"text": "Track A",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "10:00 - 11:00",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "Type: オンライン登壇",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "Speaker: kanata",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Title: <https://event.cloudnativedays.jp/cndt2101/talks/10001|ものすごい発表>"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "Next Talk",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "plain_text",
+					"text": "Track A",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "11:00 - 12:30",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "Type: 事前収録",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "Speaker: hoge, fuga",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Title: <https://event.cloudnativedays.jp/cndt2101/talks/10002|さらにものすごい発表>"
+			},
+			"accessory": {
+				"type": "button",
+				"action_id": "broadcast_scenenext",
+				"value": "1__A",
+				"text": {
+					"type": "plain_text",
+					"text": "Switching"
+				},
+				"style": "primary",
+				"confirm": {
+					"title": {
+						"type": "plain_text",
+						"text": "Move to Next Scene"
+					},
+					"text": {
+						"type": "plain_text",
+						"text": "Are you sure?"
+					},
+					"confirm": {
+						"type": "plain_text",
+						"text": "OK"
+					},
+					"deny": {
+						"type": "plain_text",
+						"text": "Cancel"
+					}
+				}
+			}
+		}
+	]
+}
+`
+
+		expectedStr := `
+{
+	"blocks": [
+		{
+			"type": "divider"
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "Current Talk",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "plain_text",
+					"text": "Track A",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "10:00 - 11:00",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "Type: オンライン登壇",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "Speaker: kanata",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Title: <https://event.cloudnativedays.jp/cndt2101/talks/10001|ものすごい発表>"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "Next Talk",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "plain_text",
+					"text": "Track A",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "11:00 - 12:30",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "Type: 事前収録",
+					"emoji": true
+				},
+				{
+					"type": "plain_text",
+					"text": "Speaker: hoge, fuga",
+					"emoji": true
+				}
+			]
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Title: <https://event.cloudnativedays.jp/cndt2101/talks/10002|さらにものすごい発表>"
+			},
+			"accessory": {
+				"type": "button",
+				"action_id": "common_nothing",
+				"text": {
+					"type": "plain_text",
+					"text": ":white_check_mark: Switched"
+				}
+			}
+		}
+	]
+}
+`
+		input, err := castFromStringToMsg(inputStr)
+		if err != nil {
+			t.Fatal(err)
+		}
+		expected, err := castFromStringToMsg(expectedStr)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got, err := BroadcastMovedToNextScene(input)
+		if err != nil {
+			t.Errorf("error = %v", err)
+			return
+		}
+		if diff := cmp.Diff(expected, got); diff != "" {
+			t.Errorf(diff)
+		}
+	})
+}

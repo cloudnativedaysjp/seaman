@@ -8,6 +8,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	pb "github.com/cloudnativedaysjp/cnd-operation-server/pkg/ws-proxy/schema"
+	"github.com/cloudnativedaysjp/seaman/seaman/api"
 )
 
 func BroadcastListTrack(track []*pb.Track) slack.Msg {
@@ -95,9 +96,13 @@ func BroadcastMovedToNextScene(msg slack.Msg) (slack.Msg, error) {
 	if !ok {
 		return slack.Msg{}, fmt.Errorf("msg.Blocks.BlockSet[-1] cannot be cast to *slack.SectionBlock")
 	}
-	secBlock.Accessory.ButtonElement.ActionID = "dummy"
-	secBlock.Accessory.ButtonElement.Text.Type = "plain_text"
-	secBlock.Accessory.ButtonElement.Text.Text = ":white_check_mark: Switched"
-	secBlock.Accessory.ButtonElement.Confirm = nil
+	secBlock.Accessory.ButtonElement = &slack.ButtonBlockElement{
+		Type:     slack.METButton,
+		ActionID: api.ActIdCommon_NothingToDo,
+		Text: &slack.TextBlockObject{
+			Type: "plain_text",
+			Text: ":white_check_mark: Switched",
+		},
+	}
 	return msg, nil
 }
