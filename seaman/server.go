@@ -129,6 +129,8 @@ func Run(conf *config.Config) error {
 			slackevents.AppMention, middleware.MiddlewareSet(
 				c.ShowVersion, middleware.RegisterCommand("version")))
 		socketmodeHandler.HandleInteractionBlockAction(
+			api.ActIdCommon_NothingToDo, c.NothingToDo)
+		socketmodeHandler.HandleInteractionBlockAction(
 			api.ActIdCommon_Cancel, c.InteractionCancel)
 	}
 

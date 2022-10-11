@@ -90,23 +90,19 @@ func broadcastEnabled(trackName string) (slack.Msg, error) {
 `, trackName))
 }
 
-func BroadcastMovedToNextScene(track api.Track) slack.Msg {
-	result, _ := broadcastMovedToNextScene(track)
-	return result
-}
-
-func broadcastMovedToNextScene(track api.Track) (slack.Msg, error) {
-	return castFromStringToMsg(fmt.Sprintf(`
-{
-	"blocks": [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Track %s の自動切り替えを有効化しました"
-			}
-		}
-	]
-}
-`, track.Name))
+func BroadcastMovedToNextScene(msg slack.Msg) (slack.Msg, error) {
+	bs := &msg.Blocks.BlockSet
+	secBlock, ok := (*bs)[len(*bs)-1].(*slack.SectionBlock)
+	if !ok {
+		return slack.Msg{}, fmt.Errorf("msg.Blocks.BlockSet[-1] cannot be cast to *slack.SectionBlock")
+	}
+	secBlock.Accessory.ButtonElement = &slack.ButtonBlockElement{
+		Type:     slack.METButton,
+		ActionID: api.ActIdCommon_NothingToDo,
+		Text: &slack.TextBlockObject{
+			Type: "plain_text",
+			Text: ":white_check_mark: Switched",
+		},
+	}
+	return msg, nil
 }

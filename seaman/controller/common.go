@@ -26,6 +26,10 @@ func NewCommonController(
 	return &CommonController{slackFactory, logger, subcommands}
 }
 
+func (c *CommonController) NothingToDo(evt *socketmode.Event, client *socketmode.Client) {
+	client.Ack(*evt.Request)
+}
+
 func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
 

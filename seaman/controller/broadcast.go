@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -152,7 +153,8 @@ func (c *BroadcastController) UpdateSceneToNext(evt *socketmode.Event, client *s
 	}
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
-	callbackValue := interaction.ActionCallback.BlockActions[0].SelectedOption.Value
+	callbackValue := getCallbackValueOnButton(interaction)
+
 	// init logger & context
 	logger := c.log.WithValues("messageTs", messageTs)
 	ctx := utils.IntoContext(context.Background(), logger)
@@ -165,19 +167,30 @@ func (c *BroadcastController) UpdateSceneToNext(evt *socketmode.Event, client *s
 	track, err := api.NewTrack(callbackValue)
 	if err != nil {
 		_ = sc.PostMessage(ctx, channelId, view.InvalidArguments(messageTs,
-			"callbackValue (trackId) must be integer"))
+			fmt.Sprintf("invalid format on callbackValue: %s", callbackValue)))
 		return
 	}
 
-	if _, err := c.cndSceneClient.MoveSceneToNext(ctx,
-		&pb.MoveSceneToNextRequest{TrackId: track.Id}); err != nil {
+	if _, err := c.cndSceneClient.MoveSceneToNext(
+		ctx, &pb.MoveSceneToNextRequest{TrackId: track.Id},
+	); err != nil {
+		logger.Error(xerrors.Errorf("message: %w", err), "cndSceneClient.MoveScneToNext() was failed")
 		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
 		return
 	}
 
-	if err := sc.UpdateMessage(ctx, channelId, messageTs,
-		view.BroadcastMovedToNextScene(track)); err != nil {
-		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message: %v", err)
+	msg, err := view.BroadcastMovedToNextScene(interaction.Message.Msg)
+	if err != nil {
+		msg := "invalid interactive message"
+		logger.Info(fmt.Sprintf("%s: %v", msg, err))
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
+		return
+	}
+
+	if err := sc.UpdateMessage(
+		ctx, channelId, messageTs, msg,
+	); err != nil {
+		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message")
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
 		return
 	}
