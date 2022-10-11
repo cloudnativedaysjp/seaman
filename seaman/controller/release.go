@@ -83,7 +83,7 @@ func (c *ReleaseController) SelectReleaseLevel(evt *socketmode.Event, client *so
 	}
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
-	callbackValue := interaction.ActionCallback.BlockActions[0].SelectedOption.Value
+	callbackValue := getCallbackValueOnStaticSelect(interaction)
 	// init logger & context
 	logger := c.log.WithValues("messageTs", messageTs)
 	ctx := utils.IntoContext(context.Background(), logger)
@@ -118,7 +118,7 @@ func (c *ReleaseController) SelectConfirmation(evt *socketmode.Event, client *so
 	}
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
-	callbackValue := interaction.ActionCallback.BlockActions[0].Value
+	callbackValue := getCallbackValueOnStaticSelect(interaction)
 	// init logger & context
 	logger := c.log.WithValues("messageTs", messageTs)
 	ctx := utils.IntoContext(context.Background(), logger)
@@ -155,7 +155,7 @@ func (c *ReleaseController) CreatePullRequestForRelease(evt *socketmode.Event, c
 	}
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
-	callbackValue := interaction.ActionCallback.BlockActions[0].Value
+	callbackValue := getCallbackValueOnStaticSelect(interaction)
 	// init logger & context
 	logger := c.log.WithValues("messageTs", messageTs)
 	ctx := utils.IntoContext(context.Background(), logger)

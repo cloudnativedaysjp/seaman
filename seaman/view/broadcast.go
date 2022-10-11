@@ -8,7 +8,6 @@ import (
 	"sigs.k8s.io/yaml"
 
 	pb "github.com/cloudnativedaysjp/cnd-operation-server/pkg/ws-proxy/schema"
-	"github.com/cloudnativedaysjp/seaman/seaman/api"
 )
 
 func BroadcastListTrack(track []*pb.Track) slack.Msg {
@@ -90,23 +89,15 @@ func broadcastEnabled(trackName string) (slack.Msg, error) {
 `, trackName))
 }
 
-func BroadcastMovedToNextScene(track api.Track) slack.Msg {
-	result, _ := broadcastMovedToNextScene(track)
-	return result
-}
-
-func broadcastMovedToNextScene(track api.Track) (slack.Msg, error) {
-	return castFromStringToMsg(fmt.Sprintf(`
-{
-	"blocks": [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Track %s の自動切り替えを有効化しました"
-			}
-		}
-	]
-}
-`, track.Name))
+func BroadcastMovedToNextScene(msg slack.Msg) (slack.Msg, error) {
+	bs := &msg.Blocks.BlockSet
+	secBlock, ok := (*bs)[len(*bs)-1].(*slack.SectionBlock)
+	if !ok {
+		return slack.Msg{}, fmt.Errorf("msg.Blocks.BlockSet[-1] cannot be cast to *slack.SectionBlock")
+	}
+	secBlock.Accessory.ButtonElement.ActionID = "dummy"
+	secBlock.Accessory.ButtonElement.Text.Type = "plain_text"
+	secBlock.Accessory.ButtonElement.Text.Text = ":white_check_mark: Switched"
+	secBlock.Accessory.ButtonElement.Confirm = nil
+	return msg, nil
 }

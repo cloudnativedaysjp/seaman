@@ -28,3 +28,11 @@ func getInteractionCallback(evt *socketmode.Event) (slack.InteractionCallback, e
 	}
 	return interaction, nil
 }
+
+func getCallbackValueOnStaticSelect(i slack.InteractionCallback) string {
+	return i.ActionCallback.BlockActions[0].SelectedOption.Value
+}
+
+func getCallbackValueOnButton(i slack.InteractionCallback) string {
+	return i.ActionCallback.BlockActions[0].Value
+}
