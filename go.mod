@@ -3,14 +3,14 @@ module github.com/cloudnativedaysjp/seaman
 go 1.19
 
 require (
-	github.com/cloudnativedaysjp/cnd-operation-server v0.0.0-20221017145936-fd3a2dd04634
+	github.com/cloudnativedaysjp/cnd-operation-server v0.0.0-20221025092652-6e77080871ba
 	github.com/creasty/defaults v1.6.0
 	github.com/go-logr/logr v1.2.3
 	github.com/go-logr/zapr v1.2.3
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.9
-	github.com/shurcooL/githubv4 v0.0.0-20220922232305-70b4d362a8cb
+	github.com/shurcooL/githubv4 v0.0.0-20221021030919-a134b1472cc7
 	github.com/slack-go/slack v0.11.3
 	go.uber.org/zap v1.23.0
 	golang.org/x/oauth2 v0.1.0
