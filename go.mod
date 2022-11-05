@@ -3,7 +3,7 @@ module github.com/cloudnativedaysjp/seaman
 go 1.19
 
 require (
-	github.com/cloudnativedaysjp/cnd-operation-server v0.0.0-20221025092652-6e77080871ba
+	github.com/cloudnativedaysjp/emtec-ecu v0.1.0
 	github.com/creasty/defaults v1.6.0
 	github.com/go-logr/logr v1.2.3
 	github.com/go-logr/zapr v1.2.3

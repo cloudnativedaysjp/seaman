@@ -1,4 +1,4 @@
-package cndoperationserver
+package emtec_ecu
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	pb "github.com/cloudnativedaysjp/cnd-operation-server/pkg/ws-proxy/schema"
+	pb "github.com/cloudnativedaysjp/emtec-ecu/pkg/ws-proxy/schema"
 )
 
 type CndWrapper struct {

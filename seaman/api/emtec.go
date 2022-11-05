@@ -8,7 +8,7 @@ import (
 
 const (
 	// Action IDs
-	ActIdBroadcast_SceneNext = "broadcast_scenenext"
+	ActIdEmtec_SceneNext = "emtec_scenenext"
 )
 
 type Track struct {
