@@ -11,6 +11,7 @@ import (
 
 type SlackClient interface {
 	PostMessage(ctx context.Context, channel string, msg slack.Msg) error
+	PostMessageToThread(ctx context.Context, channel, ts string, msg slack.Msg) error
 	UpdateMessage(ctx context.Context, channel, ts string, msg slack.Msg) error
 }
 
@@ -33,6 +34,19 @@ func (s *SlackClientImpl) PostMessage(ctx context.Context, channel string, msg s
 		slack.MsgOptionText(msg.Text, false),
 		slack.MsgOptionAttachments(msg.Attachments...),
 		slack.MsgOptionBlocks(msg.Blocks.BlockSet...),
+	)
+	if err != nil {
+		return xerrors.Errorf("message: %w", err)
+	}
+	return nil
+}
+
+func (s *SlackClientImpl) PostMessageToThread(ctx context.Context, channel, messageTs string, msg slack.Msg) error {
+	_, _, err := s.client.PostMessageContext(ctx, channel,
+		slack.MsgOptionText(msg.Text, false),
+		slack.MsgOptionAttachments(msg.Attachments...),
+		slack.MsgOptionBlocks(msg.Blocks.BlockSet...),
+		slack.MsgOptionTS(messageTs),
 	)
 	if err != nil {
 		return xerrors.Errorf("message: %w", err)
