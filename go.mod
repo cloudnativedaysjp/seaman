@@ -11,7 +11,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.9
 	github.com/shurcooL/githubv4 v0.0.0-20221021030919-a134b1472cc7
-	github.com/slack-go/slack v0.11.3
+	github.com/slack-go/slack v0.11.4
 	go.uber.org/zap v1.23.0
 	golang.org/x/oauth2 v0.1.0
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
