@@ -68,6 +68,7 @@ func Run(conf *config.Config) error {
 				grpc.WithTransportCredentials(insecure.NewCredentials()), // TODO (cloudnativedaysjp/emtec-ecu#7)
 			)
 			if err != nil {
+				logger.Error(err, "cannot connect to EMTEC-ECU, skipped")
 				return
 			}
 			cndClient = cndoperationserver.NewCndWrapper(

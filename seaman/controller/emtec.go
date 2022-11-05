@@ -102,12 +102,12 @@ func (c *EmtecController) switchAutomation(evt *socketmode.Event, client *socket
 	}
 	// parse arguments
 	s := strings.Fields(ev.Text)
-	if !(len(s) >= 2) {
+	if !(len(s) >= 4) {
 		_ = sc.PostMessage(ctx, channelId, view.InvalidArguments(messageTs,
 			"args.length must be greater than 2"))
 		return
 	}
-	trackIdStr := s[1]
+	trackIdStr := s[3]
 	trackId, err := strconv.Atoi(trackIdStr)
 	if err != nil {
 		_ = sc.PostMessage(ctx, channelId, view.InvalidArguments(messageTs,
