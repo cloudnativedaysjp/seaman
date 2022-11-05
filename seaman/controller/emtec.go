@@ -153,6 +153,7 @@ func (c *EmtecController) UpdateSceneToNext(evt *socketmode.Event, client *socke
 	}
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
+	sentUserId := interaction.User.ID
 	callbackValue := getCallbackValueOnButton(interaction)
 
 	// init logger & context
@@ -189,6 +190,15 @@ func (c *EmtecController) UpdateSceneToNext(evt *socketmode.Event, client *socke
 
 	if err := sc.UpdateMessage(
 		ctx, channelId, messageTs, msg,
+	); err != nil {
+		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message")
+		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
+		return
+	}
+
+	if err := sc.PostMessageToThread(
+		ctx, channelId, messageTs, slack.Msg{
+			Text: fmt.Sprintf("Switching was pushed by <@%s>", sentUserId)},
 	); err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message")
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
