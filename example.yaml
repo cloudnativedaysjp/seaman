@@ -9,5 +9,5 @@ release:
   targets:
   - url: https://github.com/ShotaKitazawa/kube-portal
     baseBranch: master
-broadcast:
+emtec:
   endpointUrl: localhost:20080

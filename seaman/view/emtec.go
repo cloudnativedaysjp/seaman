@@ -7,16 +7,16 @@ import (
 	"github.com/slack-go/slack"
 	"sigs.k8s.io/yaml"
 
-	pb "github.com/cloudnativedaysjp/cnd-operation-server/pkg/ws-proxy/schema"
+	pb "github.com/cloudnativedaysjp/emtec-ecu/pkg/ws-proxy/schema"
 	"github.com/cloudnativedaysjp/seaman/seaman/api"
 )
 
-func BroadcastListTrack(track []*pb.Track) slack.Msg {
-	result, _ := broadcastListTrack(track)
+func EmtecListTrack(track []*pb.Track) slack.Msg {
+	result, _ := emtecListTrack(track)
 	return result
 }
 
-func broadcastListTrack(pbTracks []*pb.Track) (slack.Msg, error) {
+func emtecListTrack(pbTracks []*pb.Track) (slack.Msg, error) {
 	type trackView struct {
 		TrackId   int32  `json:"trackId"`
 		TrackName string `json:"trackName"`
@@ -48,12 +48,12 @@ func broadcastListTrack(pbTracks []*pb.Track) (slack.Msg, error) {
 `, strings.ReplaceAll(string(data), "\n", "\\n"))))
 }
 
-func BroadcastDisabled(trackName string) slack.Msg {
-	result, _ := broadcastDisabled(trackName)
+func EmtecDisabled(trackName string) slack.Msg {
+	result, _ := emtecDisabled(trackName)
 	return result
 }
 
-func broadcastDisabled(trackName string) (slack.Msg, error) {
+func emtecDisabled(trackName string) (slack.Msg, error) {
 	return castFromStringToMsg(fmt.Sprintf(`
 {
 	"blocks": [
@@ -69,12 +69,12 @@ func broadcastDisabled(trackName string) (slack.Msg, error) {
 `, trackName))
 }
 
-func BroadcastEnabled(trackName string) slack.Msg {
-	result, _ := broadcastEnabled(trackName)
+func EmtecEnabled(trackName string) slack.Msg {
+	result, _ := emtecEnabled(trackName)
 	return result
 }
 
-func broadcastEnabled(trackName string) (slack.Msg, error) {
+func emtecEnabled(trackName string) (slack.Msg, error) {
 	return castFromStringToMsg(fmt.Sprintf(`
 {
 	"blocks": [
@@ -90,7 +90,7 @@ func broadcastEnabled(trackName string) (slack.Msg, error) {
 `, trackName))
 }
 
-func BroadcastMovedToNextScene(msg slack.Msg) (slack.Msg, error) {
+func EmtecMovedToNextScene(msg slack.Msg) (slack.Msg, error) {
 	bs := &msg.Blocks.BlockSet
 	secBlock, ok := (*bs)[len(*bs)-1].(*slack.SectionBlock)
 	if !ok {

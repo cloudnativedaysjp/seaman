@@ -12,31 +12,31 @@ import (
 	"golang.org/x/xerrors"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	pb "github.com/cloudnativedaysjp/cnd-operation-server/pkg/ws-proxy/schema"
+	pb "github.com/cloudnativedaysjp/emtec-ecu/pkg/ws-proxy/schema"
 
 	"github.com/cloudnativedaysjp/seaman/seaman/api"
-	infra_cnd "github.com/cloudnativedaysjp/seaman/seaman/infra/cnd-operation-server"
+	infra_cnd "github.com/cloudnativedaysjp/seaman/seaman/infra/emtec-ecu"
 	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infra/slack"
 	"github.com/cloudnativedaysjp/seaman/seaman/utils"
 	"github.com/cloudnativedaysjp/seaman/seaman/view"
 )
 
-type BroadcastController struct {
+type EmtecController struct {
 	slackFactory   infra_slack.SlackClientFactory
 	cndSceneClient pb.SceneServiceClient
 	cndTrackClient pb.TrackServiceClient
 	log            logr.Logger
 }
 
-func NewBroadcastController(
+func NewEmtecController(
 	logger logr.Logger,
 	slackFactory infra_slack.SlackClientFactory,
 	cndClient *infra_cnd.CndWrapper,
-) *BroadcastController {
-	return &BroadcastController{slackFactory, cndClient, cndClient, logger}
+) *EmtecController {
+	return &EmtecController{slackFactory, cndClient, cndClient, logger}
 }
 
-func (c *BroadcastController) ListTrack(evt *socketmode.Event, client *socketmode.Client) {
+func (c *EmtecController) ListTrack(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
 	ev, err := getAppMentionEvent(evt)
 	if err != nil {
@@ -64,24 +64,24 @@ func (c *BroadcastController) ListTrack(evt *socketmode.Event, client *socketmod
 		return
 	}
 
-	if err := sc.PostMessage(ctx, channelId, view.BroadcastListTrack(resp.Tracks)); err != nil {
+	if err := sc.PostMessage(ctx, channelId, view.EmtecListTrack(resp.Tracks)); err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message")
 		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
 		return
 	}
 }
 
-func (c *BroadcastController) EnableAutomation(evt *socketmode.Event, client *socketmode.Client) {
+func (c *EmtecController) EnableAutomation(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
 	c.switchAutomation(evt, client, true)
 }
 
-func (c *BroadcastController) DisableAutomation(evt *socketmode.Event, client *socketmode.Client) {
+func (c *EmtecController) DisableAutomation(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
 	c.switchAutomation(evt, client, false)
 }
 
-func (c *BroadcastController) switchAutomation(evt *socketmode.Event, client *socketmode.Client, enabled bool) {
+func (c *EmtecController) switchAutomation(evt *socketmode.Event, client *socketmode.Client, enabled bool) {
 	ev, err := getAppMentionEvent(evt)
 	if err != nil {
 		c.log.Error(err, "failed to get AppMentionEvent")
@@ -124,7 +124,7 @@ func (c *BroadcastController) switchAutomation(evt *socketmode.Event, client *so
 			_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
 			return
 		}
-		msg = view.BroadcastEnabled(resp.TrackName)
+		msg = view.EmtecEnabled(resp.TrackName)
 	} else {
 		resp, err := c.cndTrackClient.DisableAutomation(ctx,
 			&pb.SwitchAutomationRequest{TrackId: int32(trackId)})
@@ -133,7 +133,7 @@ func (c *BroadcastController) switchAutomation(evt *socketmode.Event, client *so
 			_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
 			return
 		}
-		msg = view.BroadcastDisabled(resp.TrackName)
+		msg = view.EmtecDisabled(resp.TrackName)
 	}
 
 	if err := sc.PostMessage(ctx, channelId, msg); err != nil {
@@ -143,7 +143,7 @@ func (c *BroadcastController) switchAutomation(evt *socketmode.Event, client *so
 	}
 }
 
-func (c *BroadcastController) UpdateSceneToNext(evt *socketmode.Event, client *socketmode.Client) {
+func (c *EmtecController) UpdateSceneToNext(evt *socketmode.Event, client *socketmode.Client) {
 	client.Ack(*evt.Request)
 
 	interaction, err := getInteractionCallback(evt)
@@ -179,7 +179,7 @@ func (c *BroadcastController) UpdateSceneToNext(evt *socketmode.Event, client *s
 		return
 	}
 
-	msg, err := view.BroadcastMovedToNextScene(interaction.Message.Msg)
+	msg, err := view.EmtecMovedToNextScene(interaction.Message.Msg)
 	if err != nil {
 		msg := "invalid interactive message"
 		logger.Info(fmt.Sprintf("%s: %v", msg, err))

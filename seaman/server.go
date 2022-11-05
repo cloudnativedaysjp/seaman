@@ -12,12 +12,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	pb "github.com/cloudnativedaysjp/cnd-operation-server/pkg/ws-proxy/schema"
+	pb "github.com/cloudnativedaysjp/emtec-ecu/pkg/ws-proxy/schema"
 
 	"github.com/cloudnativedaysjp/seaman/config"
 	"github.com/cloudnativedaysjp/seaman/seaman/api"
 	"github.com/cloudnativedaysjp/seaman/seaman/controller"
-	cndoperationserver "github.com/cloudnativedaysjp/seaman/seaman/infra/cnd-operation-server"
+	cndoperationserver "github.com/cloudnativedaysjp/seaman/seaman/infra/emtec-ecu"
 	"github.com/cloudnativedaysjp/seaman/seaman/infra/gitcommand"
 	"github.com/cloudnativedaysjp/seaman/seaman/infra/githubapi"
 	infra_slack "github.com/cloudnativedaysjp/seaman/seaman/infra/slack"
@@ -62,10 +62,10 @@ func Run(conf *config.Config) error {
 	githubApiClient := githubapi.NewGitHubApiClientImpl(conf.GitHub.AccessToken)
 	gitCommandClient := gitcommand.NewGitCommandClientImpl(conf.GitHub.Username, conf.GitHub.AccessToken)
 	var cndClient *cndoperationserver.CndWrapper
-	if conf.Broadcast.EndpointUrl != "" {
+	if conf.Emtec.EndpointUrl != "" {
 		func() {
-			conn, err := grpc.Dial(conf.Broadcast.EndpointUrl,
-				grpc.WithTransportCredentials(insecure.NewCredentials()), // TODO (cloudnativedaysjp/cnd-operation-server#7)
+			conn, err := grpc.Dial(conf.Emtec.EndpointUrl,
+				grpc.WithTransportCredentials(insecure.NewCredentials()), // TODO (cloudnativedaysjp/emtec-ecu#7)
 			)
 			if err != nil {
 				return
@@ -99,25 +99,25 @@ func Run(conf *config.Config) error {
 		socketmodeHandler.HandleInteractionBlockAction(
 			api.ActIdRelease_OK, c.CreatePullRequestForRelease)
 	}
-	if cndClient != nil { // broadcast
-		c := controller.NewBroadcastController(logger, slackFactory, cndClient)
+	if cndClient != nil { // emtec
+		c := controller.NewEmtecController(logger, slackFactory, cndClient)
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(c.ListTrack,
-				middleware.RegisterCommand("broadcast", "list-track").
-					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/broadcast.md"),
+				middleware.RegisterCommand("emtec", "list-track").
+					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/emtec.md"),
 			))
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(c.EnableAutomation,
-				middleware.RegisterCommand("broadcast", "enable-track").
-					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/broadcast.md"),
+				middleware.RegisterCommand("emtec", "enable-track").
+					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/emtec.md"),
 			))
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(c.DisableAutomation,
-				middleware.RegisterCommand("broadcast", "disable-track").
-					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/broadcast.md"),
+				middleware.RegisterCommand("emtec", "disable-track").
+					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/emtec.md"),
 			))
 		socketmodeHandler.HandleInteractionBlockAction(
-			api.ActIdBroadcast_SceneNext, c.UpdateSceneToNext)
+			api.ActIdEmtec_SceneNext, c.UpdateSceneToNext)
 	}
 	{ // common
 		c := controller.NewCommonController(logger,

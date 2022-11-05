@@ -5,10 +5,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	pb "github.com/cloudnativedaysjp/cnd-operation-server/pkg/ws-proxy/schema"
+	pb "github.com/cloudnativedaysjp/emtec-ecu/pkg/ws-proxy/schema"
 )
 
-func Test_broadcastListTrack(t *testing.T) {
+func Test_emtecListTrack(t *testing.T) {
 	t.Run("test", func(t *testing.T) {
 		expectedStr := replaceBackquote(`
 {
@@ -41,7 +41,7 @@ func Test_broadcastListTrack(t *testing.T) {
 				Enabled:   false,
 			},
 		}
-		got, err := broadcastListTrack(track)
+		got, err := emtecListTrack(track)
 		if err != nil {
 			t.Errorf("error = %v", err)
 			return
@@ -52,7 +52,7 @@ func Test_broadcastListTrack(t *testing.T) {
 	})
 }
 
-func Test_BroadcastMovedToNextScene(t *testing.T) {
+func Test_EmtecMovedToNextScene(t *testing.T) {
 	t.Run("test", func(t *testing.T) {
 		inputStr := `
 {
@@ -148,7 +148,7 @@ func Test_BroadcastMovedToNextScene(t *testing.T) {
 			},
 			"accessory": {
 				"type": "button",
-				"action_id": "broadcast_scenenext",
+				"action_id": "emtec_scenenext",
 				"value": "1__A",
 				"text": {
 					"type": "plain_text",
@@ -291,7 +291,7 @@ func Test_BroadcastMovedToNextScene(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		got, err := BroadcastMovedToNextScene(input)
+		got, err := EmtecMovedToNextScene(input)
 		if err != nil {
 			t.Errorf("error = %v", err)
 			return
