@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 	"sync"
 
@@ -50,7 +49,7 @@ func (m Command) Handle(next socketmode.SocketmodeHandlerFunc) socketmode.Socket
 			panicF()
 		}
 		s := strings.Fields(appMentionEvent.Text)[1:]
-		if len(s) >= len(m.Prefixes) && reflect.DeepEqual(s, m.Prefixes) {
+		if len(s) >= len(m.Prefixes) && strings.HasPrefix(strings.Join(s, " "), strings.Join(m.Prefixes, " ")) {
 			next(evt, c)
 		}
 	}
