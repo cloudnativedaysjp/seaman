@@ -12,6 +12,7 @@ import (
 	"golang.org/x/xerrors"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/cloudnativedaysjp/emtec-ecu/pkg/infra/dreamkast"
 	pb "github.com/cloudnativedaysjp/emtec-ecu/pkg/ws-proxy/schema"
 
 	"github.com/cloudnativedaysjp/seaman/seaman/api"
@@ -25,15 +26,17 @@ type EmtecController struct {
 	slackFactory   infra_slack.SlackClientFactory
 	cndSceneClient pb.SceneServiceClient
 	cndTrackClient pb.TrackServiceClient
+	dkClient       dreamkast.Client
 	log            logr.Logger
 }
 
 func NewEmtecController(
 	logger logr.Logger,
 	slackFactory infra_slack.SlackClientFactory,
-	cndClient *infra_cnd.CndWrapper,
+	obsClient *infra_cnd.CndWrapper,
+	dkClient dreamkast.Client,
 ) *EmtecController {
-	return &EmtecController{slackFactory, cndClient, cndClient, logger}
+	return &EmtecController{slackFactory, obsClient, obsClient, dkClient, logger}
 }
 
 func (c *EmtecController) ListTrack(evt *socketmode.Event, client *socketmode.Client) {
@@ -163,9 +166,10 @@ func (c *EmtecController) UpdateSceneToNext(evt *socketmode.Event, client *socke
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
 		logger.Error(xerrors.Errorf("message: %w", err), "failed to initialize Slack client")
+		return
 	}
 
-	track, err := api.NewTrack(callbackValue)
+	track, err := api.CastToTrack(callbackValue)
 	if err != nil {
 		_ = sc.PostMessage(ctx, channelId, view.InvalidArguments(messageTs,
 			fmt.Sprintf("invalid format on callbackValue: %s", callbackValue)))
@@ -181,6 +185,69 @@ func (c *EmtecController) UpdateSceneToNext(evt *socketmode.Event, client *socke
 	}
 
 	msg, err := view.EmtecMovedToNextScene(interaction.Message.Msg)
+	if err != nil {
+		msg := "invalid interactive message"
+		logger.Info(fmt.Sprintf("%s: %v", msg, err))
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
+		return
+	}
+
+	if err := sc.UpdateMessage(
+		ctx, channelId, messageTs, msg,
+	); err != nil {
+		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message")
+		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
+		return
+	}
+
+	if err := sc.PostMessageToThread(
+		ctx, channelId, messageTs, slack.Msg{
+			Text: fmt.Sprintf("Switching was pushed by <@%s>", sentUserId)},
+	); err != nil {
+		logger.Error(xerrors.Errorf("message: %w", err), "failed to post message")
+		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
+		return
+	}
+}
+
+func (c *EmtecController) MakeNextTalkOnAir(evt *socketmode.Event, client *socketmode.Client) {
+	client.Ack(*evt.Request)
+
+	interaction, err := getInteractionCallback(evt)
+	if err != nil {
+		c.log.Error(err, "failed to get InteractionCallback")
+		return
+	}
+	channelId := interaction.Container.ChannelID
+	messageTs := interaction.Container.MessageTs
+	sentUserId := interaction.User.ID
+	callbackValue := getCallbackValueOnButton(interaction)
+
+	// init logger & context
+	logger := c.log.WithValues("messageTs", messageTs)
+	ctx := utils.IntoContext(context.Background(), logger)
+	// new client from factory
+	sc, err := c.slackFactory.New(client.Client)
+	if err != nil {
+		logger.Error(xerrors.Errorf("message: %w", err), "failed to initialize Slack client")
+		return
+	}
+
+	track, err := api.CastToTrack(callbackValue)
+	if err != nil {
+		_ = sc.PostMessage(ctx, channelId, view.InvalidArguments(messageTs,
+			fmt.Sprintf("invalid format on callbackValue: %s", callbackValue)))
+		return
+	}
+
+	if err := c.dkClient.SetSpecifiedTalkOnAir(ctx, track.NextTalkId); err != nil {
+		msg := "dkClient.SetSpecifiedTalkOnAir was failed"
+		logger.Info(fmt.Sprintf("%s: %v", msg, err))
+		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
+		return
+	}
+
+	msg, err := view.EmtecMadeNextTalkOnAir(interaction.Message.Msg)
 	if err != nil {
 		msg := "invalid interactive message"
 		logger.Info(fmt.Sprintf("%s: %v", msg, err))
