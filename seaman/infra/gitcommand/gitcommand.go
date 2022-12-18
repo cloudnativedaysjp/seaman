@@ -46,7 +46,7 @@ func (g *GitCommandClientImpl) Clone(ctx context.Context, org, repo string) (str
 		strings.Join([]string{fmt.Sprintf(baseURL, g.user, g.token), org, repo}, "/"), // https://<user>:<token>@github.com/<org>/<repo>
 		downloadDir)
 	if msg, err := cmd.CombinedOutput(); err != nil {
-		return "", xerrors.Errorf("message: %w", msg)
+		return "", xerrors.Errorf("message: %s", msg)
 	}
 	return downloadDir, nil
 }
@@ -55,7 +55,7 @@ func (g *GitCommandClientImpl) SwitchNewBranch(ctx context.Context, dirPath, bra
 	cmd := exec.CommandContext(ctx, "git", "switch", "-c", branch)
 	cmd.Dir = dirPath
 	if msg, err := cmd.CombinedOutput(); err != nil {
-		return xerrors.Errorf("message: %w", msg)
+		return xerrors.Errorf("message: %s", msg)
 	}
 	return nil
 }
@@ -64,22 +64,22 @@ func (g *GitCommandClientImpl) CommitAll(ctx context.Context, dirPath, commitMsg
 	cmd := exec.CommandContext(ctx, "git", "config", "user.name", g.user)
 	cmd.Dir = dirPath
 	if msg, err := cmd.CombinedOutput(); err != nil {
-		return xerrors.Errorf("message: %w", msg)
+		return xerrors.Errorf("message: %s", msg)
 	}
 	cmd = exec.CommandContext(ctx, "git", "config", "user.email", g.email)
 	cmd.Dir = dirPath
 	if msg, err := cmd.CombinedOutput(); err != nil {
-		return xerrors.Errorf("message: %w", msg)
+		return xerrors.Errorf("message: %s", msg)
 	}
 	cmd = exec.CommandContext(ctx, "git", "add", "-A")
 	cmd.Dir = dirPath
 	if msg, err := cmd.CombinedOutput(); err != nil {
-		return xerrors.Errorf("message: %w", msg)
+		return xerrors.Errorf("message: %s", msg)
 	}
 	cmd = exec.CommandContext(ctx, "git", "commit", "--allow-empty", "-m", commitMsg)
 	cmd.Dir = dirPath
 	if msg, err := cmd.CombinedOutput(); err != nil {
-		return xerrors.Errorf("message: %w", msg)
+		return xerrors.Errorf("message: %s", msg)
 	}
 	return nil
 }
@@ -88,7 +88,7 @@ func (g *GitCommandClientImpl) Push(ctx context.Context, dirPath string) error {
 	cmd := exec.CommandContext(ctx, "git", "push", "origin", "HEAD")
 	cmd.Dir = dirPath
 	if msg, err := cmd.CombinedOutput(); err != nil {
-		return xerrors.Errorf("message: %w", msg)
+		return xerrors.Errorf("message: %s", msg)
 	}
 	return nil
 }
