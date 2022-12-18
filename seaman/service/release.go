@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	releaseHeadBranchPrefix = "release/bot_"
+	releaseHeadBranchPrefix = "bot/release/"
 )
 
 type ReleaseService struct {
