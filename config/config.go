@@ -66,5 +66,14 @@ type ReleaseTarget struct {
 }
 
 type EmtecConfig struct {
-	EndpointUrl string `json:"endpointUrl"`
+	EndpointUrl string               `json:"endpointUrl"`
+	Dreamkast   EmtecDreamkastConfig `json:"dreamkast"`
+}
+
+type EmtecDreamkastConfig struct {
+	EndpointUrl         string `json:"endpointUrl"`
+	Auth0Domain         string `json:"auth0Domain"`
+	Auth0ClientId       string `json:"auth0ClientId"`
+	Auth0ClientSecret   string `json:"auth0ClientSecret"`
+	Auth0ClientAudience string `json:"auth0ClientAudience" default:"https://event.cloudnativedays.jp/"`
 }

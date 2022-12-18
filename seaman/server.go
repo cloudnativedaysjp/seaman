@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/cloudnativedaysjp/emtec-ecu/pkg/infra/dreamkast"
 	pb "github.com/cloudnativedaysjp/emtec-ecu/pkg/ws-proxy/schema"
 
 	"github.com/cloudnativedaysjp/seaman/config"
@@ -61,7 +62,7 @@ func Run(conf *config.Config) error {
 	slackFactory := infra_slack.NewSlackClientFactory()
 	githubApiClient := githubapi.NewGitHubApiClientImpl(conf.GitHub.AccessToken)
 	gitCommandClient := gitcommand.NewGitCommandClientImpl(conf.GitHub.Username, conf.GitHub.AccessToken)
-	var cndClient *cndoperationserver.CndWrapper
+	var obsClient *cndoperationserver.CndWrapper
 	if conf.Emtec.EndpointUrl != "" {
 		func() {
 			conn, err := grpc.Dial(conf.Emtec.EndpointUrl,
@@ -71,11 +72,21 @@ func Run(conf *config.Config) error {
 				logger.Error(err, "cannot connect to EMTEC-ECU, skipped")
 				return
 			}
-			cndClient = cndoperationserver.NewCndWrapper(
+			obsClient = cndoperationserver.NewCndWrapper(
 				pb.NewSceneServiceClient(conn), pb.NewTrackServiceClient(conn),
 			)
 		}()
 	}
+	dkClient, err := dreamkast.NewClient(conf.Emtec.Dreamkast.EndpointUrl)
+	if err != nil {
+		return err
+	}
+	dkClient = dkClient.WithCredential(
+		conf.Emtec.Dreamkast.Auth0Domain,
+		conf.Emtec.Dreamkast.Auth0ClientId,
+		conf.Emtec.Dreamkast.Auth0ClientSecret,
+		conf.Emtec.Dreamkast.Auth0ClientAudience,
+	)
 
 	{ // release
 		var targets []controller.Target
@@ -100,8 +111,8 @@ func Run(conf *config.Config) error {
 		socketmodeHandler.HandleInteractionBlockAction(
 			api.ActIdRelease_OK, c.CreatePullRequestForRelease)
 	}
-	if cndClient != nil { // emtec
-		c := controller.NewEmtecController(logger, slackFactory, cndClient)
+	if obsClient != nil { // emtec
+		c := controller.NewEmtecController(logger, slackFactory, obsClient, dkClient)
 		socketmodeHandler.HandleEvents(
 			slackevents.AppMention, middleware.MiddlewareSet(c.ListTrack,
 				middleware.RegisterCommand("emtec", "list-track").
@@ -119,6 +130,8 @@ func Run(conf *config.Config) error {
 			))
 		socketmodeHandler.HandleInteractionBlockAction(
 			api.ActIdEmtec_SceneNext, c.UpdateSceneToNext)
+		socketmodeHandler.HandleInteractionBlockAction(
+			api.ActIdEmtec_OnAirNext, c.MakeNextTalkOnAir)
 	}
 	{ // common
 		c := controller.NewCommonController(logger,

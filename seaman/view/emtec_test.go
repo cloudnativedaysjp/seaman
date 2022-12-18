@@ -149,7 +149,7 @@ func Test_EmtecMovedToNextScene(t *testing.T) {
 			"accessory": {
 				"type": "button",
 				"action_id": "emtec_scenenext",
-				"value": "1__A",
+				"value": "1__A__10002",
 				"text": {
 					"type": "plain_text",
 					"text": "Switching"
@@ -277,6 +277,45 @@ func Test_EmtecMovedToNextScene(t *testing.T) {
 				"text": {
 					"type": "plain_text",
 					"text": ":white_check_mark: Switched"
+				}
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "plain_text",
+				"text": "Set nextTalk OnAir"
+			},
+			"accessory": {
+				"type": "button",
+				"action_id": "emtec_onairnext",
+				"text": {
+					"type": "plain_text",
+					"text": "Switching",
+					"emoji": true
+				},
+				"value": "1__A__10002",
+				"style": "primary",
+				"confirm": {
+					"title": {
+						"type": "plain_text",
+						"text": "Set nextTalk OnAir"
+					},
+					"text": {
+						"type": "plain_text",
+						"text": "Are you sure?"
+					},
+					"confirm": {
+						"type": "plain_text",
+						"text": "OK"
+					},
+					"deny": {
+						"type": "plain_text",
+						"text": "Cancel"
+					}
 				}
 			}
 		}

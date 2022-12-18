@@ -91,6 +91,69 @@ func emtecEnabled(trackName string) (slack.Msg, error) {
 }
 
 func EmtecMovedToNextScene(msg slack.Msg) (slack.Msg, error) {
+	// update "Move to Next Scene" Button
+	var buttonValue string
+	bs := &msg.Blocks.BlockSet
+	secBlock, ok := (*bs)[len(*bs)-1].(*slack.SectionBlock)
+	if !ok {
+		return slack.Msg{}, fmt.Errorf("msg.Blocks.BlockSet[-1] cannot be cast to *slack.SectionBlock")
+	}
+	buttonValue = secBlock.Accessory.ButtonElement.Value
+	secBlock.Accessory.ButtonElement = &slack.ButtonBlockElement{
+		Type:     slack.METButton,
+		ActionID: api.ActIdCommon_NothingToDo,
+		Text: &slack.TextBlockObject{
+			Type: "plain_text",
+			Text: ":white_check_mark: Switched",
+		},
+	}
+	// add "Set nextTalk OnAir" Button
+	accessory := &slack.Accessory{
+		ButtonElement: &slack.ButtonBlockElement{
+			Type:     slack.METButton,
+			ActionID: api.ActIdEmtec_OnAirNext,
+			Value:    buttonValue,
+			Text: &slack.TextBlockObject{
+				Type:  "plain_text",
+				Text:  "Switching",
+				Emoji: true,
+			},
+			Style: slack.StylePrimary,
+			Confirm: &slack.ConfirmationBlockObject{
+				Title: &slack.TextBlockObject{
+					Type: "plain_text",
+					Text: "Set nextTalk OnAir",
+				},
+				Text: &slack.TextBlockObject{
+					Type: "plain_text",
+					Text: "Are you sure?",
+				},
+				Confirm: &slack.TextBlockObject{
+					Type: "plain_text",
+					Text: "OK",
+				},
+				Deny: &slack.TextBlockObject{
+					Type: "plain_text",
+					Text: "Cancel",
+				},
+			},
+		},
+	}
+	msg.Blocks.BlockSet = append(msg.Blocks.BlockSet, slack.NewDividerBlock())
+	msg.Blocks.BlockSet = append(msg.Blocks.BlockSet, &slack.SectionBlock{
+		Type: slack.MBTSection,
+		Text: &slack.TextBlockObject{
+			Type: slack.PlainTextType,
+			Text: "Set nextTalk OnAir",
+		},
+		Accessory: accessory,
+	})
+
+	return msg, nil
+}
+
+func EmtecMadeNextTalkOnAir(msg slack.Msg) (slack.Msg, error) {
+	// update "Set nextTalk OnAir" Button
 	bs := &msg.Blocks.BlockSet
 	secBlock, ok := (*bs)[len(*bs)-1].(*slack.SectionBlock)
 	if !ok {
