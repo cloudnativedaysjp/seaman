@@ -30,14 +30,22 @@ Setup 手順にこれらの GitHub Actions の用意の手順も記載されて�
 +       baseBranch: master
 ```
 
+
+### GitHub App が対象のリポジトリを見るように設定
+
+seaman からリリースを行いたいリポジトリに GitHub App [`GitOps for CloudNativeDays`](https://github.com/organizations/cloudnativedaysjp/settings/installations/29106044) をインストールします。
+
+* https://github.com/organizations/cloudnativedaysjp/settings/installations/29106044
+    * `Repository access` > `Select repositories` > seaman から操作したいリポジトリを選択
+
 ### Bot により作成された PR を merge した際に自動でタグを付与する
 
-* Bot により作成された PR を merge したときに自動でタグをインクリメントする GitHub Action を作成します。 (eg. [push-tag-by-releasebot.yml](https://github.com/cloudnativedaysjp/seaman/blob/main/.github/workflows/push-tag-by-releasebot.yml))
-    * `if: contains(github.event.pull_request.title, '[dreamkast-releasebot]')` : releasebot が作成した PR にのみ反応するようにしています
-    * `Generate token` step : GitHub Actions から tag が push されたことを契機に別の action をトリガするために、GitHub App のクレデンシャルを利用するようにしています
-        * GitHub App は [`GitOps for CloudNativeDays`](https://github.com/organizations/cloudnativedaysjp/settings/installations/29106044) を利用してください
-        * `APP_ID` , `PRIVATE_KEY` はそれぞれ GitHub の Actions secrets にて値を登録してください
+Bot により作成された PR を merge したときに自動でタグをインクリメントする GitHub Action を作成します。 (eg. [push-tag-by-releasebot.yml](https://github.com/cloudnativedaysjp/seaman/blob/main/.github/workflows/push-tag-by-releasebot.yml))
 
+* `if: contains(github.event.pull_request.title, '[dreamkast-releasebot]')` : releasebot が作成した PR にのみ反応するようにしています
+* `Generate token` step : GitHub Actions から tag が push されたことを契機に別の action をトリガするために、GitHub App のクレデンシャルを利用するようにしています
+    * GitHub App は [`GitOps for CloudNativeDays`](https://github.com/organizations/cloudnativedaysjp/settings/installations/29106044) を利用してください
+    * `APP_ID` , `PRIVATE_KEY` は GitHub の Actions secrets にて値を登録してください
 
 ```yaml
 name: Push a new tag with merged Pull Request
@@ -83,6 +91,7 @@ jobs:
           tag: ${{ steps.bump-semver.outputs.new_version }}
           message: '${{ steps.bump-semver.outputs.new_version }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}'
 ```
+
 
 ### タグが付与された際に production 環境にデプロイする
 
