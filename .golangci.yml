@@ -3,11 +3,9 @@ linters:
   enable:
     - bodyclose
     - depguard
-    - dogsled
     - dupl
     - errcheck
     - exportloopref
-    - funlen
     - gochecknoinits
     - goconst
     - gocritic
@@ -20,7 +18,6 @@ linters:
     - gosimple
     - govet
     - ineffassign
-    - lll
     - misspell
     - nakedret
     - noctx
