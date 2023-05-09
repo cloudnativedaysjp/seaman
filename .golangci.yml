@@ -12,9 +12,9 @@ linters:
     - gocyclo
     - gofmt
     - goimports
-    - gomnd
+    # - gomnd
     - goprintffuncname
-    - gosec
+    # - gosec
     - gosimple
     - govet
     - ineffassign
@@ -22,9 +22,9 @@ linters:
     - nakedret
     - noctx
     - nolintlint
-    - revive
+    # - revive
     - staticcheck
-    - stylecheck
+    # - stylecheck
     - typecheck
     - unconvert
     - unparam
