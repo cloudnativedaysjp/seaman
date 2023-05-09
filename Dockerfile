@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 ### builder ###
 FROM golang:1.19 as builder
 
@@ -6,21 +7,30 @@ WORKDIR /workspace
 ARG APP_VERSION
 ARG APP_COMMIT
 # Copy the Go Modules
-COPY go.mod go.mod
-COPY go.sum go.sum
+COPY --link go.mod go.mod
+COPY --link go.sum go.sum
 RUN go mod download
-COPY . .
+COPY --link . .
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "\
+ARG GOOS=linux
+ARG GOARCH=amd64
+RUN --mount=type=cache,target=/go/pkg/mod \
+  --mount=type=cache,target=/root/.cache/go-build \
+  CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -ldflags "\
   -X github.com/cloudnativedaysjp/seaman/version.Version=${APP_VERSION} \
   -X github.com/cloudnativedaysjp/seaman/version.Commit=${APP_COMMIT} \
-  " -tags osusergo,netgo -a -o seaman .
+  -s -w \
+  " -trimpath -tags osusergo,netgo -a -o seaman .
 
 ### runner ###
 FROM alpine:3.17.0
+
+LABEL org.opencontainers.image.authors="Shota Kitazawa, Kohei Ota"
+LABEL org.opencontainers.image.url="https://github.com/cloudnativedaysjp/seaman"
+LABEL org.opencontainers.image.source="https://github.com/cloudnativedaysjp/seaman/blob/main/Dockerfile"
 WORKDIR /
 RUN apk add -u git
-COPY --from=builder /workspace/seaman .
+COPY --link --from=builder /workspace/seaman .
 USER 65532:65532
 
 ENTRYPOINT ["/seaman"]
