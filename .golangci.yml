@@ -30,22 +30,16 @@ linters:
     - unparam
     - unused
     - whitespace
+  fast: true
 
 linters-settings:
   nolintlint:
     allow-unused: false
     allow-leading-space: false
     require-specific: true
-  staticcheck:
-    go: "1.20"
-  stylecheck:
-    go: "1.20"
-  unused:
-    go: "1.20"
 
 run:
   timeout: 10m
   skip-files:
   - "zz_generated.*\\.go$"
   allow-parallel-runners: true
-
