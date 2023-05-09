@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 ### builder ###
-FROM golang:1.19 as builder
+FROM golang:1.20 as builder
 
 WORKDIR /workspace
 # Arguments
@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
   " -trimpath -tags osusergo,netgo -a -o seaman .
 
 ### runner ###
-FROM alpine:3.17.0
+FROM alpine:3.17
 
 LABEL org.opencontainers.image.authors="Shota Kitazawa, Kohei Ota"
 LABEL org.opencontainers.image.url="https://github.com/cloudnativedaysjp/seaman"
