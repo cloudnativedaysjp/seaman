@@ -52,7 +52,7 @@ lint: golangci-lint ## Run golangci-lint against code.
 	$(GOLANGCI_LINT) run -c .golangci.yml
 
 .PHONY: test
-test: fmt vet lint ## Run some test against code.
+test: fmt vet ## Run some test against code.
 	go test ./... -cover -v
 
 
