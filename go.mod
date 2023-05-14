@@ -6,7 +6,7 @@ require (
 	github.com/cloudnativedaysjp/emtec-ecu v0.2.0
 	github.com/creasty/defaults v1.7.0
 	github.com/go-logr/logr v1.2.4
-	github.com/go-logr/zapr v1.2.3
+	github.com/go-logr/zapr v1.2.4
 	github.com/go-playground/validator/v10 v10.13.0
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.9
