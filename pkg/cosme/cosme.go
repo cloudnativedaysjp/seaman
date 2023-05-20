@@ -15,9 +15,15 @@ import (
 type issueCommentHandler func(ctx context.Context, payload github.IssueCommentPayload, args []string) error
 
 type handler struct {
+	c        chan data
+	commands map[string]issueCommentHandler
 	logger   *slog.Logger
 	hook     *github.Webhook
-	commands map[string]issueCommentHandler
+}
+
+type data struct {
+	payload github.IssueCommentPayload
+	ctx     context.Context
 }
 
 func New(logger *slog.Logger, secret string) (*handler, error) {
@@ -29,9 +35,10 @@ func New(logger *slog.Logger, secret string) (*handler, error) {
 		return nil, err
 	}
 	return &handler{
+		make(chan data),
+		make(map[string]issueCommentHandler),
 		logger.With("package", "cosme"),
 		hook,
-		make(map[string]issueCommentHandler),
 	}, nil
 }
 
@@ -62,22 +69,35 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// hook handler
-	commandAndArgs := strings.Fields(payload.Comment.Body)
-	if len(commandAndArgs) == 0 {
+
+	if len(strings.Fields(payload.Comment.Body)) == 0 {
 		h.logger.Info("invalid command: args.length == 0")
 		return
 	}
-	ctx := r.Context()
-	fmt.Println(ctx.Deadline())
-	for registeredCommand, handler := range h.commands {
-		if commandAndArgs[0] == registeredCommand {
-			if err := handler(r.Context(), payload, commandAndArgs[1:]); err != nil {
-				h.logger.Error(fmt.Sprintf("internal server error: %v", err))
-				w.WriteHeader(http.StatusInternalServerError)
-				return
+	h.c <- data{payload, r.Context()}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *handler) RunBackground() {
+	for d := range h.c {
+		select {
+		case <-d.ctx.Done():
+			h.logger.Info("context has already exceeded")
+			continue
+		default:
+		}
+
+		ctx := context.Background()
+		commandAndArgs := strings.Fields(d.payload.Comment.Body)
+
+		for registeredCommand, handler := range h.commands {
+			if commandAndArgs[0] == registeredCommand {
+				if err := handler(ctx, d.payload, commandAndArgs[1:]); err != nil {
+					h.logger.Error(fmt.Sprintf("internal server error: %v", err))
+					return
+				}
 			}
 		}
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
