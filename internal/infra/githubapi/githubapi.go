@@ -237,7 +237,7 @@ func (g *GitHubApiClientImpl) GetPullRequestTitleAndChangedFilepaths(ctx context
 	title := ""
 	changedFilesNum := 1
 	changedFiles := []string{}
-	for i := 0; i*pageLimit < int(changedFilesNum); i++ {
+	for i := 0; i*pageLimit < changedFilesNum; i++ {
 		if err := client.Query(ctx, &query, queryVars); err != nil {
 			return "", nil, err
 		}
@@ -245,7 +245,7 @@ func (g *GitHubApiClientImpl) GetPullRequestTitleAndChangedFilepaths(ctx context
 			changedFiles = append(changedFiles, string(edge.Node.Path))
 		}
 		if len(query.Repository.PullRequest.Files.Edges) == pageLimit {
-			queryVars["after"] = githubv4.String(query.Repository.PullRequest.Files.Edges[pageLimit].Cursor)
+			queryVars["after"] = query.Repository.PullRequest.Files.Edges[pageLimit].Cursor
 		}
 		title = string(query.Repository.PullRequest.Title)
 		changedFilesNum = int(query.Repository.PullRequest.ChangedFiles)
