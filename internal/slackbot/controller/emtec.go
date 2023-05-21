@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/slack-go/slack"
+	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 	"golang.org/x/exp/slog"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -15,9 +16,9 @@ import (
 
 	infra_cnd "github.com/cloudnativedaysjp/seaman/internal/infra/emtec-ecu"
 	infra_slack "github.com/cloudnativedaysjp/seaman/internal/infra/slack"
-	"github.com/cloudnativedaysjp/seaman/internal/log"
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot/api"
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot/view"
+	"github.com/cloudnativedaysjp/seaman/pkg/log"
 )
 
 type EmtecController struct {
@@ -35,19 +36,11 @@ func NewEmtecController(
 	return &EmtecController{slackFactory, cndClient, cndClient, logger}
 }
 
-func (c *EmtecController) ListTrack(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-	ev, err := getAppMentionEvent(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get AppMentionEvent: %v", err))
-		return
-	}
+func (c *EmtecController) ListTrack(ctx context.Context, ev *slackevents.AppMentionEvent, client *socketmode.Client) {
+	logger := log.FromContext(ctx)
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
 
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -69,28 +62,19 @@ func (c *EmtecController) ListTrack(evt *socketmode.Event, client *socketmode.Cl
 	}
 }
 
-func (c *EmtecController) EnableAutomation(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-	c.switchAutomation(evt, client, true)
+func (c *EmtecController) EnableAutomation(ctx context.Context, ev *slackevents.AppMentionEvent, client *socketmode.Client) {
+	c.switchAutomation(ctx, ev, client, true)
 }
 
-func (c *EmtecController) DisableAutomation(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-	c.switchAutomation(evt, client, false)
+func (c *EmtecController) DisableAutomation(ctx context.Context, ev *slackevents.AppMentionEvent, client *socketmode.Client) {
+	c.switchAutomation(ctx, ev, client, false)
 }
 
-func (c *EmtecController) switchAutomation(evt *socketmode.Event, client *socketmode.Client, enabled bool) {
-	ev, err := getAppMentionEvent(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get AppMentionEvent: %v", err))
-		return
-	}
+func (c *EmtecController) switchAutomation(ctx context.Context, ev *slackevents.AppMentionEvent, client *socketmode.Client, enabled bool) {
+	logger := log.FromContext(ctx)
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
 
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -140,22 +124,13 @@ func (c *EmtecController) switchAutomation(evt *socketmode.Event, client *socket
 	}
 }
 
-func (c *EmtecController) UpdateSceneToNext(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-
-	interaction, err := getInteractionCallback(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get InteractionCallback: %v", err))
-		return
-	}
+func (c *EmtecController) UpdateSceneToNext(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) {
+	logger := log.FromContext(ctx)
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
 	sentUserId := interaction.User.ID
 	callbackValue := getCallbackValueOnButton(interaction)
 
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {

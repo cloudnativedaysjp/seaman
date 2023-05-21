@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/slack-go/slack"
-	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -19,10 +18,10 @@ import (
 	"github.com/cloudnativedaysjp/seaman/internal/infra/gitcommand"
 	"github.com/cloudnativedaysjp/seaman/internal/infra/githubapi"
 	infra_slack "github.com/cloudnativedaysjp/seaman/internal/infra/slack"
-	seamanlog "github.com/cloudnativedaysjp/seaman/internal/log"
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot/api"
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot/controller"
-	"github.com/cloudnativedaysjp/seaman/internal/slackbot/middleware"
+	"github.com/cloudnativedaysjp/seaman/pkg/lacks"
+	seamanlog "github.com/cloudnativedaysjp/seaman/pkg/log"
 )
 
 func Run(ctx context.Context, conf *config.Config) error {
@@ -49,7 +48,8 @@ func Run(ctx context.Context, conf *config.Config) error {
 			),
 		)
 	}
-	socketmodeHandler := socketmode.NewSocketmodeHandler(client)
+
+	r := lacks.New(logger, client)
 
 	// setup some instances
 	slackFactory := infra_slack.NewSlackClientFactory()
@@ -78,58 +78,51 @@ func Run(ctx context.Context, conf *config.Config) error {
 		}
 		c := controller.NewReleaseController(logger,
 			slackFactory, gitCommandClient, githubApiClient, targets)
-		socketmodeHandler.HandleEvents(
-			slackevents.AppMention, middleware.MiddlewareSet(c.SelectRepository,
-				middleware.RegisterCommand("release").
-					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/release.md"),
-			))
-		socketmodeHandler.HandleInteractionBlockAction(
+		// socketmodeHandler.HandleEvents(
+		// 	slackevents.AppMention, middleware.MiddlewareSet(c.SelectRepository,
+		// 		middleware.RegisterCommand("release").
+		// 			WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/release.md"),
+		// 	))
+		r.HandleMentionedMessage(
+			"release", c.SelectRepository).
+			WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/release.md")
+		r.HandleInteractionBlockAction(
 			api.ActIdRelease_SelectedRepository, c.SelectReleaseLevel)
-		socketmodeHandler.HandleInteractionBlockAction(
+		r.HandleInteractionBlockAction(
 			api.ActIdRelease_SelectedLevelMajor, c.SelectConfirmation)
-		socketmodeHandler.HandleInteractionBlockAction(
+		r.HandleInteractionBlockAction(
 			api.ActIdRelease_SelectedLevelMinor, c.SelectConfirmation)
-		socketmodeHandler.HandleInteractionBlockAction(
+		r.HandleInteractionBlockAction(
 			api.ActIdRelease_SelectedLevelPatch, c.SelectConfirmation)
-		socketmodeHandler.HandleInteractionBlockAction(
+		r.HandleInteractionBlockAction(
 			api.ActIdRelease_OK, c.CreatePullRequestForRelease)
 	}
 	if cndClient != nil { // emtec
 		c := controller.NewEmtecController(logger, slackFactory, cndClient)
-		socketmodeHandler.HandleEvents(
-			slackevents.AppMention, middleware.MiddlewareSet(c.ListTrack,
-				middleware.RegisterCommand("emtec", "list-track").
-					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/emtec.md"),
-			))
-		socketmodeHandler.HandleEvents(
-			slackevents.AppMention, middleware.MiddlewareSet(c.EnableAutomation,
-				middleware.RegisterCommand("emtec", "enable-track").
-					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/emtec.md"),
-			))
-		socketmodeHandler.HandleEvents(
-			slackevents.AppMention, middleware.MiddlewareSet(c.DisableAutomation,
-				middleware.RegisterCommand("emtec", "disable-track").
-					WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/emtec.md"),
-			))
-		socketmodeHandler.HandleInteractionBlockAction(
+		r.HandleMentionedMessage(
+			"emtec list-track", c.ListTrack).
+			WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/emtec.md")
+		r.HandleMentionedMessage(
+			"emtec enable-track", c.EnableAutomation).
+			WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/emtec.md")
+		r.HandleMentionedMessage(
+			"emtec disable-track", c.DisableAutomation).
+			WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/emtec.md")
+		r.HandleInteractionBlockAction(
 			api.ActIdEmtec_SceneNext, c.UpdateSceneToNext)
 	}
 	{ // common
 		c := controller.NewCommonController(logger,
-			slackFactory, middleware.Subcommands.List())
-		socketmodeHandler.HandleEvents(
-			slackevents.AppMention, middleware.MiddlewareSet(
-				c.ShowCommands, middleware.RegisterCommand("help")))
-		socketmodeHandler.HandleEvents(
-			slackevents.AppMention, middleware.MiddlewareSet(
-				c.ShowVersion, middleware.RegisterCommand("version")))
-		socketmodeHandler.HandleInteractionBlockAction(
-			api.ActIdCommon_NothingToDo, c.NothingToDo)
-		socketmodeHandler.HandleInteractionBlockAction(
+			slackFactory)
+		r.HandleHelp(c.ShowCommands)
+		r.HandleMentionedMessage("version", c.ShowVersion)
+		r.HandleInteractionBlockAction(
+			api.ActIdCommon_NothingToDo, c.InteractionNothingToDo)
+		r.HandleInteractionBlockAction(
 			api.ActIdCommon_Cancel, c.InteractionCancel)
 	}
 
-	if err := socketmodeHandler.RunEventLoop(); err != nil {
+	if err := r.RunEventLoop(); err != nil {
 		return err
 	}
 	return nil

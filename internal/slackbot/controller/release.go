@@ -4,16 +4,18 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/slack-go/slack"
+	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 	"golang.org/x/exp/slog"
 
 	"github.com/cloudnativedaysjp/seaman/internal/infra/gitcommand"
 	"github.com/cloudnativedaysjp/seaman/internal/infra/githubapi"
 	infra_slack "github.com/cloudnativedaysjp/seaman/internal/infra/slack"
-	"github.com/cloudnativedaysjp/seaman/internal/log"
 	"github.com/cloudnativedaysjp/seaman/internal/service"
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot/api"
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot/view"
+	"github.com/cloudnativedaysjp/seaman/pkg/log"
 )
 
 type Target struct {
@@ -40,19 +42,10 @@ func NewReleaseController(
 	return &ReleaseController{slackFactory, service, logger, targets}
 }
 
-func (c *ReleaseController) SelectRepository(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-
-	ev, err := getAppMentionEvent(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get AppMentionEvent: %v", err))
-		return
-	}
+func (c *ReleaseController) SelectRepository(ctx context.Context, ev *slackevents.AppMentionEvent, client *socketmode.Client) {
+	logger := log.FromContext(ctx)
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -73,20 +66,12 @@ func (c *ReleaseController) SelectRepository(evt *socketmode.Event, client *sock
 	}
 }
 
-func (c *ReleaseController) SelectReleaseLevel(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-
-	interaction, err := getInteractionCallback(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get InteractionCallback: %v", err))
-		return
-	}
+//nolint:dupl
+func (c *ReleaseController) SelectReleaseLevel(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) {
+	logger := log.FromContext(ctx)
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
 	callbackValue := getCallbackValueOnStaticSelect(interaction)
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -108,20 +93,12 @@ func (c *ReleaseController) SelectReleaseLevel(evt *socketmode.Event, client *so
 	}
 }
 
-func (c *ReleaseController) SelectConfirmation(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-
-	interaction, err := getInteractionCallback(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get InteractionCallback: %v", err))
-		return
-	}
+//nolint:dupl
+func (c *ReleaseController) SelectConfirmation(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) {
+	logger := log.FromContext(ctx)
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
 	callbackValue := getCallbackValueOnButton(interaction)
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -145,20 +122,11 @@ func (c *ReleaseController) SelectConfirmation(evt *socketmode.Event, client *so
 	}
 }
 
-func (c *ReleaseController) CreatePullRequestForRelease(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-
-	interaction, err := getInteractionCallback(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get InteractionCallback: %v", err))
-		return
-	}
+func (c *ReleaseController) CreatePullRequestForRelease(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) {
+	logger := log.FromContext(ctx)
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
 	callbackValue := getCallbackValueOnButton(interaction)
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {

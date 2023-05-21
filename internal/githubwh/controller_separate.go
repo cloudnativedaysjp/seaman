@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-playground/webhooks/v6/github"
 
-	"github.com/cloudnativedaysjp/seaman/internal/log"
+	"github.com/cloudnativedaysjp/seaman/pkg/log"
 	"github.com/cloudnativedaysjp/seaman/pkg/utils"
 )
 

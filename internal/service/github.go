@@ -11,7 +11,7 @@ import (
 
 	"github.com/cloudnativedaysjp/seaman/internal/infra/gitcommand"
 	"github.com/cloudnativedaysjp/seaman/internal/infra/githubapi"
-	"github.com/cloudnativedaysjp/seaman/internal/log"
+	"github.com/cloudnativedaysjp/seaman/pkg/log"
 )
 
 type GitHubIface interface {

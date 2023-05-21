@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudnativedaysjp/seaman/internal/log"
+	"github.com/cloudnativedaysjp/seaman/pkg/log"
 	"github.com/cloudnativedaysjp/seaman/pkg/utils"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"

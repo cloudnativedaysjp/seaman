@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/webhooks/v6/github"
 	"golang.org/x/exp/slog"
 
+	"github.com/cloudnativedaysjp/seaman/pkg/log"
 	"github.com/cloudnativedaysjp/seaman/pkg/utils"
 )
 
@@ -89,6 +90,7 @@ func (h *handler) RunBackground() {
 		}
 
 		ctx := context.Background()
+		ctx = log.IntoContext(ctx, h.logger)
 		commandAndArgs := strings.Fields(d.payload.Comment.Body)
 
 		for registeredCommand, handler := range h.commands {

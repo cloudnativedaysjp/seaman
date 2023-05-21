@@ -10,8 +10,8 @@ import (
 
 	"github.com/cloudnativedaysjp/seaman/cmd/seaman/config"
 	"github.com/cloudnativedaysjp/seaman/internal/githubwh"
-	"github.com/cloudnativedaysjp/seaman/internal/log"
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot"
+	"github.com/cloudnativedaysjp/seaman/pkg/log"
 )
 
 func main() {

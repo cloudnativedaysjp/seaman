@@ -4,46 +4,35 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/slack-go/slack"
+	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 	"golang.org/x/exp/slog"
 
 	infra_slack "github.com/cloudnativedaysjp/seaman/internal/infra/slack"
-	"github.com/cloudnativedaysjp/seaman/internal/log"
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot/view"
+	"github.com/cloudnativedaysjp/seaman/pkg/log"
 )
 
 type CommonController struct {
 	slackFactory infra_slack.SlackClientFactory
 	log          *slog.Logger
-
-	subcommands map[string]string
 }
 
 func NewCommonController(
 	logger *slog.Logger,
 	slackFactory infra_slack.SlackClientFactory,
-	subcommands map[string]string,
 ) *CommonController {
-	return &CommonController{slackFactory, logger, subcommands}
+	return &CommonController{slackFactory, logger}
 }
 
-func (c *CommonController) NothingToDo(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-}
-
-func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-
-	ev, err := getAppMentionEvent(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get AppMentionEvent: %v", err))
-		return
-	}
+func (c *CommonController) ShowCommands(ctx context.Context,
+	ev *slackevents.AppMentionEvent,
+	client *socketmode.Client, subcommands map[string]string,
+) {
+	logger := log.FromContext(ctx)
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -53,7 +42,7 @@ func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmod
 	}
 
 	if err := sc.PostMessage(ctx, channelId,
-		view.ShowCommands(c.subcommands),
+		view.ShowCommands(subcommands),
 	); err != nil {
 		logger.Error(fmt.Sprintf("failed to post message: %v", err))
 		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
@@ -61,19 +50,10 @@ func (c *CommonController) ShowCommands(evt *socketmode.Event, client *socketmod
 	}
 }
 
-func (c *CommonController) ShowVersion(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
-
-	ev, err := getAppMentionEvent(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get AppMentionEvent: %v", err))
-		return
-	}
+func (c *CommonController) ShowVersion(ctx context.Context, ev *slackevents.AppMentionEvent, client *socketmode.Client) {
+	logger := log.FromContext(ctx)
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
@@ -89,19 +69,13 @@ func (c *CommonController) ShowVersion(evt *socketmode.Event, client *socketmode
 	}
 }
 
-func (c *CommonController) InteractionCancel(evt *socketmode.Event, client *socketmode.Client) {
-	client.Ack(*evt.Request)
+func (c *CommonController) InteractionNothingToDo(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) {
+}
 
-	interaction, err := getInteractionCallback(evt)
-	if err != nil {
-		c.log.Error(fmt.Sprintf("failed to get InteractionCallback: %v", err))
-		return
-	}
+func (c *CommonController) InteractionCancel(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) {
+	logger := log.FromContext(ctx)
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
-	// init logger & context
-	logger := c.log.With("messageTs", messageTs)
-	ctx := log.IntoContext(context.Background(), logger)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
