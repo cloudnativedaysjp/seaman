@@ -7,7 +7,7 @@ require (
 	github.com/creasty/defaults v1.7.0
 	github.com/go-logr/logr v1.2.4
 	github.com/go-logr/zapr v1.2.4
-	github.com/go-playground/validator/v10 v10.13.0
+	github.com/go-playground/validator/v10 v10.14.0
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.9
 	github.com/shurcooL/githubv4 v0.0.0-20230424031643-6cea62ecd5a9
@@ -21,11 +21,12 @@ require (
 )
 
 require (
+	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
-	github.com/leodido/go-urn v1.2.3 // indirect
+	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/shurcooL/graphql v0.0.0-20220606043923-3cf50f8a0a29 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
