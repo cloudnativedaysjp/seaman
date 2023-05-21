@@ -17,10 +17,10 @@ ARG GOARCH=amd64
 RUN --mount=type=cache,target=/go/pkg/mod \
   --mount=type=cache,target=/root/.cache/go-build \
   CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -ldflags "\
-  -X github.com/cloudnativedaysjp/seaman/version.Version=${APP_VERSION} \
-  -X github.com/cloudnativedaysjp/seaman/version.Commit=${APP_COMMIT} \
+  -X github.com/cloudnativedaysjp/seaman/internal/version.Version=${APP_VERSION} \
+  -X github.com/cloudnativedaysjp/seaman/internal/version.Commit=${APP_COMMIT} \
   -s -w \
-  " -trimpath -tags osusergo,netgo -a -o seaman .
+  " -trimpath -tags osusergo,netgo -a -o seaman ./cmd/seaman/
 
 ### runner ###
 FROM alpine:3.18
