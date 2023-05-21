@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/slack-go/slack"
+	"golang.org/x/xerrors"
 	"sigs.k8s.io/yaml"
 
 	pb "github.com/cloudnativedaysjp/emtec-ecu/pkg/ws-proxy/schema"
@@ -95,7 +96,7 @@ func EmtecMovedToNextScene(msg slack.Msg) (slack.Msg, error) {
 	bs := &msg.Blocks.BlockSet
 	secBlock, ok := (*bs)[len(*bs)-1].(*slack.SectionBlock)
 	if !ok {
-		return slack.Msg{}, fmt.Errorf("msg.Blocks.BlockSet[-1] cannot be cast to *slack.SectionBlock")
+		return slack.Msg{}, xerrors.Errorf("msg.Blocks.BlockSet[-1] cannot be cast to *slack.SectionBlock")
 	}
 	secBlock.Accessory.ButtonElement = &slack.ButtonBlockElement{
 		Type:     slack.METButton,

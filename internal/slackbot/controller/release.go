@@ -8,6 +8,7 @@ import (
 	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 	"golang.org/x/exp/slog"
+	"golang.org/x/xerrors"
 
 	"github.com/cloudnativedaysjp/seaman/internal/infra/gitcommand"
 	"github.com/cloudnativedaysjp/seaman/internal/infra/githubapi"
@@ -16,6 +17,7 @@ import (
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot/api"
 	"github.com/cloudnativedaysjp/seaman/internal/slackbot/view"
 	"github.com/cloudnativedaysjp/seaman/pkg/log"
+	"github.com/cloudnativedaysjp/seaman/pkg/utils"
 )
 
 type Target struct {
@@ -42,14 +44,13 @@ func NewReleaseController(
 	return &ReleaseController{slackFactory, service, logger, targets}
 }
 
-func (c *ReleaseController) SelectRepository(ctx context.Context, ev *slackevents.AppMentionEvent, client *socketmode.Client) {
-	logger := log.FromContext(ctx)
+func (c *ReleaseController) SelectRepository(ctx context.Context, ev *slackevents.AppMentionEvent, client *socketmode.Client) error {
 	channelId := ev.Channel
 	messageTs := ev.TimeStamp
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to initialize Slack client: %v", err))
+		return xerrors.Errorf("failed to initialize Slack client: %w", err)
 	}
 
 	var targetUrls []string
@@ -60,92 +61,84 @@ func (c *ReleaseController) SelectRepository(ctx context.Context, ev *slackevent
 	if err := sc.PostMessage(ctx, channelId,
 		view.ReleaseListRepo(targetUrls),
 	); err != nil {
-		logger.Error(fmt.Sprintf("failed to post message: %v", err))
 		_ = sc.PostMessage(ctx, channelId, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("failed to post message: %w", err)
 	}
+	return nil
 }
 
 //nolint:dupl
-func (c *ReleaseController) SelectReleaseLevel(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) {
+func (c *ReleaseController) SelectReleaseLevel(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) error {
 	logger := log.FromContext(ctx)
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
-	callbackValue := getCallbackValueOnStaticSelect(interaction)
+
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to initialize Slack client: %v", err))
-		return
+		return xerrors.Errorf("failed to initialize Slack client: %w", err)
 	}
 
-	orgRepo, err := api.NewOrgRepo(callbackValue)
+	orgRepo, err := api.NewOrgRepo(utils.GetCallbackValueOnStaticSelect(interaction))
 	if err != nil {
-		logger.Error(fmt.Sprintf("invalid callback value: %v", err),
-			"callbackValue", callbackValue)
+		logger.Debug(fmt.Sprintf("invalid callback value: %v", err))
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return nil
 	}
 	if err := sc.UpdateMessage(ctx, channelId, messageTs, view.ReleaseListLevel(orgRepo)); err != nil {
-		logger.Error(fmt.Sprintf("failed to post message: %v", err))
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("failed to post message: %w", err)
 	}
+	return nil
 }
 
 //nolint:dupl
-func (c *ReleaseController) SelectConfirmation(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) {
+func (c *ReleaseController) SelectConfirmation(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) error {
 	logger := log.FromContext(ctx)
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
-	callbackValue := getCallbackValueOnButton(interaction)
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to initialize Slack client: %v", err))
-		return
+		return xerrors.Errorf("failed to initialize Slack client: %w", err)
 	}
 
-	orgRepoLevel, err := api.NewOrgRepoLevel(callbackValue)
+	orgRepoLevel, err := api.NewOrgRepoLevel(utils.GetCallbackValueOnButton(interaction))
 	if err != nil {
-		logger.Error(fmt.Sprintf("invalid callback value: %v", err),
-			"callbackValue", callbackValue)
+		logger.Debug(fmt.Sprintf("invalid callback value: %v", err))
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return nil
 	}
 	if err := sc.UpdateMessage(
 		ctx, channelId, messageTs, view.ReleaseConfirmation(orgRepoLevel),
 	); err != nil {
-		logger.Error(fmt.Sprintf("failed to post message: %v", err))
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("failed to post message: %w", err)
 	}
+	return nil
 }
 
-func (c *ReleaseController) CreatePullRequestForRelease(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) {
+func (c *ReleaseController) CreatePullRequestForRelease(ctx context.Context, interaction slack.InteractionCallback, client *socketmode.Client) error {
 	logger := log.FromContext(ctx)
 	channelId := interaction.Container.ChannelID
 	messageTs := interaction.Container.MessageTs
-	callbackValue := getCallbackValueOnButton(interaction)
+
 	// new client from factory
 	sc, err := c.slackFactory.New(client.Client)
 	if err != nil {
-		logger.Error(fmt.Sprintf("failed to initialize Slack client: %v", err))
-		return
+		return xerrors.Errorf("failed to initialize Slack client: %w", err)
 	}
 
-	orgRepoLevel, err := api.NewOrgRepoLevel(callbackValue)
+	orgRepoLevel, err := api.NewOrgRepoLevel(utils.GetCallbackValueOnButton(interaction))
 	if err != nil {
-		logger.Error(fmt.Sprintf("invalid callback value: %v", err),
-			"callbackValue", callbackValue)
+		logger.Debug(fmt.Sprintf("invalid callback value: %v", err))
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return nil
 	}
 
 	if err := sc.UpdateMessage(ctx, channelId, messageTs, view.ReleaseProcessing()); err != nil {
-		logger.Error(fmt.Sprintf("failed to post message: %v", err))
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("failed to post message: %w", err)
 	}
 
 	var baseBranch string
@@ -159,16 +152,15 @@ func (c *ReleaseController) CreatePullRequestForRelease(ctx context.Context, int
 	prNum, err := c.service.CreatePullRequestWithEmptyCommit(ctx,
 		orgRepoLevel.Org(), orgRepoLevel.Repo(), orgRepoLevel.Level(), baseBranch, messageTs)
 	if err != nil {
-		logger.Error(fmt.Sprintf("service.CreatePullRequest was failed: %v", err))
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("service.CreatePullRequest failed: %w", err)
 	}
 
 	if err := sc.UpdateMessage(
 		ctx, channelId, messageTs, view.ReleaseDisplayPrLink(orgRepoLevel, prNum),
 	); err != nil {
-		logger.Error(fmt.Sprintf("failed to post message: %v", err))
 		_ = sc.UpdateMessage(ctx, channelId, messageTs, view.SomethingIsWrong(messageTs))
-		return
+		return xerrors.Errorf("failed to post message: %w", err)
 	}
+	return nil
 }

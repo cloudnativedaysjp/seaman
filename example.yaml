@@ -1,4 +1,5 @@
-debug: true
+debug: false
+stacktrace: true
 slack:
   botToken: ${SLACK_BOT_TOKEN}
   appToken: ${SLACK_APP_TOKEN}

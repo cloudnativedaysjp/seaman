@@ -36,7 +36,7 @@ func (s *SlackClientImpl) PostMessage(ctx context.Context, channel string, msg s
 		slack.MsgOptionBlocks(msg.Blocks.BlockSet...),
 	)
 	if err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("%w", err)
 	}
 	return nil
 }
@@ -49,7 +49,7 @@ func (s *SlackClientImpl) PostMessageToThread(ctx context.Context, channel, mess
 		slack.MsgOptionTS(messageTs),
 	)
 	if err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("%w", err)
 	}
 	return nil
 }
@@ -62,7 +62,7 @@ func (s *SlackClientImpl) UpdateMessage(ctx context.Context, channel, ts string,
 		slack.MsgOptionBlocks(msg.Blocks.BlockSet...),
 	)
 	if err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("%w", err)
 	}
 	return nil
 }

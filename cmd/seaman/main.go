@@ -23,7 +23,20 @@ func main() {
 	eg, ctx := errgroup.WithContext(context.Background())
 
 	// for Logger
-	loggerOpts := &slog.HandlerOptions{}
+	loggerOpts := &slog.HandlerOptions{
+		Level:     slog.LevelInfo,
+		AddSource: true,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key != log.KeyDetail {
+				return a
+			}
+			err, ok := a.Value.Any().(error)
+			if !ok || !conf.StackTrace {
+				return slog.Attr{}
+			}
+			return slog.String(log.KeyDetail, fmt.Sprintf("%+v", err))
+		},
+	}
 	if conf.Debug {
 		loggerOpts.Level = slog.LevelDebug
 	}

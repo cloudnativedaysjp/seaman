@@ -49,7 +49,7 @@ func Run(ctx context.Context, conf *config.Config) error {
 		)
 	}
 
-	r := lacks.New(logger, client)
+	r := lacks.NewRouter(logger, client)
 
 	// setup some instances
 	slackFactory := infra_slack.NewSlackClientFactory()

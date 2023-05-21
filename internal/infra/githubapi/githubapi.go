@@ -75,7 +75,7 @@ func (g *GitHubApiClientImpl) CheckPrIsForInfraAndCreatedByRenovate(ctx context.
 		"labelsFirst":     githubv4.Int(labelLimit),
 	}
 	if err := client.Query(ctx, &query, queryVars); err != nil {
-		return false, "", err
+		return false, "", xerrors.Errorf("%w", err)
 	}
 	// if changeFiles == `expectedNumOfUpdatedFiles`
 	if int(query.Repository.PullRequest.ChangedFiles) != expectedNumOfUpdatedFiles {
@@ -106,7 +106,7 @@ func (g *GitHubApiClientImpl) CreateIssueComment(ctx context.Context, org, repo 
 
 	prId, err := g.getPullRequestId(ctx, org, repo, prNum)
 	if err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("getPullRequestId failed: %w", err)
 	}
 
 	var mutationAddComment struct {
@@ -120,7 +120,7 @@ func (g *GitHubApiClientImpl) CreateIssueComment(ctx context.Context, org, repo 
 		SubjectID: prId,
 		Body:      githubv4.String(body),
 	}, nil); err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("%w", err)
 	}
 	return nil
 }
@@ -130,13 +130,13 @@ func (g *GitHubApiClientImpl) CreateLabels(ctx context.Context, org, repo string
 
 	prId, err := g.getPullRequestId(ctx, org, repo, prNum)
 	if err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("getPullRequestId failed: %w", err)
 	}
 	labelIds := []githubv4.ID{}
 	for _, label := range labels {
 		labelId, err := g.getLabelId(ctx, org, repo, label)
 		if err != nil {
-			return xerrors.Errorf("message: %w", err)
+			return xerrors.Errorf("getLabelId failed: %w", err)
 		}
 		labelIds = append(labelIds, labelId)
 	}
@@ -152,7 +152,7 @@ func (g *GitHubApiClientImpl) CreateLabels(ctx context.Context, org, repo string
 		PullRequestID: prId,
 		LabelIDs:      &labelIds,
 	}, nil); err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("CreateLabels failed: %w", err)
 	}
 	return nil
 }
@@ -162,7 +162,7 @@ func (g *GitHubApiClientImpl) CreatePullRequest(ctx context.Context, org, repo, 
 
 	repoId, err := g.getRepositoryId(ctx, org, repo)
 	if err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("getRepositoryId failed: %w", err)
 	}
 
 	var mutationCreatePR struct {
@@ -179,7 +179,7 @@ func (g *GitHubApiClientImpl) CreatePullRequest(ctx context.Context, org, repo, 
 		Title:        githubv4.String(title),
 		Body:         githubv4.NewString(githubv4.String(body)),
 	}, nil); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, err
 	}
 
 	return mutationCreatePR.CreatePullRequest.PullRequest.Number, nil
@@ -190,7 +190,7 @@ func (g *GitHubApiClientImpl) DeleteBranch(ctx context.Context, org, repo, headB
 
 	id, err := g.getBranchId(ctx, org, repo, headBranch)
 	if err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("getBranchId failed: %w", err)
 	}
 
 	var mutationDeleteBranch struct {
@@ -201,7 +201,7 @@ func (g *GitHubApiClientImpl) DeleteBranch(ctx context.Context, org, repo, headB
 	if err := client.Mutate(ctx, &mutationDeleteBranch, githubv4.DeleteRefInput{
 		RefID: id,
 	}, nil); err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("%w", err)
 	}
 	return nil
 }
@@ -239,7 +239,7 @@ func (g *GitHubApiClientImpl) GetPullRequestTitleAndChangedFilepaths(ctx context
 	changedFiles := []string{}
 	for i := 0; i*pageLimit < changedFilesNum; i++ {
 		if err := client.Query(ctx, &query, queryVars); err != nil {
-			return "", nil, err
+			return "", nil, xerrors.Errorf("%w", err)
 		}
 		for _, edge := range query.Repository.PullRequest.Files.Edges {
 			changedFiles = append(changedFiles, string(edge.Node.Path))
@@ -263,7 +263,7 @@ func (g *GitHubApiClientImpl) HealthCheck() error {
 		}
 	}
 	if err := client.Query(ctx, &q, nil); err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("%w", err)
 	}
 	return nil
 }
@@ -286,7 +286,7 @@ func (g *GitHubApiClientImpl) getBranchId(ctx context.Context, org, repo, branch
 		"repositoryName":  githubv4.String(repo),
 		"qualifiedName":   githubv4.String(branch),
 	}); err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("%w", err)
 	}
 	return queryGetBranchID.Repository.Ref.ID, nil
 }
@@ -305,10 +305,10 @@ func (g *GitHubApiClientImpl) getLabelId(ctx context.Context, org, repo, label s
 		"repositoryName":  githubv4.String(repo),
 		"labelName":       githubv4.String(label),
 	}); err != nil {
-		return nil, err
+		return nil, xerrors.Errorf("%w", err)
 	}
 	if queryGetLabel.Repository.Label.ID == nil {
-		return nil, fmt.Errorf("no such label: %v", label)
+		return nil, xerrors.Errorf("no such label: %s", label)
 	}
 	return queryGetLabel.Repository.Label.ID, nil
 }
@@ -327,7 +327,7 @@ func (g *GitHubApiClientImpl) getPullRequestId(ctx context.Context, org, repo st
 		"repositoryName":    githubv4.String(repo),
 		"pullRequestNumber": githubv4.Int(prNum),
 	}); err != nil {
-		return 0, err
+		return 0, xerrors.Errorf("%w", err)
 	}
 	return queryGetPullRequest.Repository.PullRequest.ID, nil
 }
@@ -343,7 +343,7 @@ func (g *GitHubApiClientImpl) getRepositoryId(ctx context.Context, org, repo str
 		"repositoryOwner": githubv4.String(org),
 		"repositoryName":  githubv4.String(repo),
 	}); err != nil {
-		return 0, err
+		return 0, xerrors.Errorf("%w", err)
 	}
 	return queryGetRepository.Repository.ID, nil
 }

@@ -18,7 +18,7 @@ type issueCommentHandler func(ctx context.Context, payload github.IssueCommentPa
 type handler struct {
 	c        chan data
 	commands map[string]issueCommentHandler
-	logger   *slog.Logger
+	log      *slog.Logger
 	hook     *github.Webhook
 }
 
@@ -65,14 +65,14 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// if the user who send the IssueComment is unauthorized, skip
 	roles := []string{"OWNER", "COLLABORATOR", "CONTRIBUTOR", "MEMBER"}
 	if !utils.Contains(roles, payload.Comment.AuthorAssociation) {
-		h.logger.Info("unauthorized the user who send the IssueComment")
+		h.log.Info("unauthorized the user who send the IssueComment")
 		return
 	}
 
 	// hook handler
 
 	if len(strings.Fields(payload.Comment.Body)) == 0 {
-		h.logger.Info("invalid command: args.length == 0")
+		h.log.Info("invalid command: args.length == 0")
 		return
 	}
 	h.c <- data{payload, r.Context()}
@@ -84,19 +84,20 @@ func (h *handler) RunBackground() {
 	for d := range h.c {
 		select {
 		case <-d.ctx.Done():
-			h.logger.Info("context has already exceeded")
+			h.log.Info("context has already exceeded")
 			continue
 		default:
 		}
 
 		ctx := context.Background()
-		ctx = log.IntoContext(ctx, h.logger)
+		ctx = log.IntoContext(ctx, h.log)
 		commandAndArgs := strings.Fields(d.payload.Comment.Body)
 
 		for registeredCommand, handler := range h.commands {
 			if commandAndArgs[0] == registeredCommand {
 				if err := handler(ctx, d.payload, commandAndArgs[1:]); err != nil {
-					h.logger.Error(fmt.Sprintf("internal server error: %v", err))
+					h.log.Error(fmt.Sprintf("internal server error: %v", err),
+						log.KeyDetail, err)
 					return
 				}
 			}

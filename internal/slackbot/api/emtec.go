@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"golang.org/x/xerrors"
 )
 
 const (
@@ -19,11 +21,11 @@ type Track struct {
 func NewTrack(str string) (Track, error) {
 	s := strings.Split(str, "__")
 	if len(s) != 2 {
-		return Track{}, fmt.Errorf("callbackValue (%s) is not expected", str)
+		return Track{}, xerrors.Errorf("callbackValue (%s) is not expected", str)
 	}
 	trackId, err := strconv.Atoi(s[0])
 	if err != nil {
-		return Track{}, fmt.Errorf("callbackValue (%s) is not expected", str)
+		return Track{}, xerrors.Errorf("callbackValue (%s) is not expected", str)
 	}
 	return Track{int32(trackId), s[1]}, nil
 }

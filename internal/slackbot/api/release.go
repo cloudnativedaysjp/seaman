@@ -3,6 +3,8 @@ package api
 import (
 	"fmt"
 	"strings"
+
+	"golang.org/x/xerrors"
 )
 
 const (
@@ -26,7 +28,7 @@ type OrgRepo struct {
 func NewOrgRepo(str string) (OrgRepo, error) {
 	s := strings.Split(str, "__")
 	if len(s) != 2 {
-		return OrgRepo{}, fmt.Errorf("callbackValue (%s) is not expected", str)
+		return OrgRepo{}, xerrors.Errorf("callbackValue (%s) is not expected", str)
 	}
 	return OrgRepo{s[0], s[1]}, nil
 }
@@ -59,7 +61,7 @@ type OrgRepoLevel struct {
 func NewOrgRepoLevel(str string) (OrgRepoLevel, error) {
 	s := strings.Split(str, "__")
 	if len(s) != 3 {
-		return OrgRepoLevel{}, fmt.Errorf("callbackValue (%s) is not expected", str)
+		return OrgRepoLevel{}, xerrors.Errorf("callbackValue (%s) is not expected", str)
 	}
 	return OrgRepoLevel{OrgRepo{s[0], s[1]}, s[2]}, nil
 }

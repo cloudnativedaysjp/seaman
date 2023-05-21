@@ -52,7 +52,7 @@ func (s *GitHub) CreatePullRequestWithEmptyCommit(ctx context.Context,
 	//
 	repoDir, err := s.gitcommand.Clone(ctx, org, repo, gitcommand.CloneOpt{Branch: targetBaseBranch, Depth: 1})
 	if err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("gitcommand.Clone failed: %w", err)
 	}
 	// remove working dir finally
 	defer func() {
@@ -65,13 +65,13 @@ func (s *GitHub) CreatePullRequestWithEmptyCommit(ctx context.Context,
 	// switch -> empty commit -> push
 	//
 	if err := s.gitcommand.SwitchNewBranch(ctx, repoDir, headBranchName); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("gitcommand.SwitchNewBranch failed: %w", err)
 	}
 	if err := s.gitcommand.CommitAll(ctx, repoDir, "[Bot] for release!!"); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("gitcommand.CommitAll failed: %w", err)
 	}
 	if err := s.gitcommand.Push(ctx, repoDir); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("gitcommand.Push failed: %w", err)
 	}
 
 	//
@@ -80,10 +80,10 @@ func (s *GitHub) CreatePullRequestWithEmptyCommit(ctx context.Context,
 	prNum, err := s.githubapi.CreatePullRequest(ctx, org, repo, headBranchName,
 		targetBaseBranch, "[dreamkast-releasebot] Automatic Release", "Automatic Release")
 	if err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("githubapi.CreatePullRequest failed: %w", err)
 	}
 	if err := s.githubapi.CreateLabels(ctx, org, repo, prNum, []string{level}); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("githubapi.CreateLabels failed: %w", err)
 	}
 
 	return prNum, nil
@@ -126,7 +126,7 @@ func (s *GitHub) separatePullRequest(ctx context.Context,
 	//
 	repoDir, err := s.gitcommand.Clone(ctx, org, repo, gitcommand.CloneOpt{Branch: prBranch})
 	if err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("gitcommand.Clone failed: %w", err)
 	}
 	// remove working dir finally
 	defer func() {
@@ -139,16 +139,16 @@ func (s *GitHub) separatePullRequest(ctx context.Context,
 	// switch -> update files -> commit --amend -> push
 	//
 	if err := s.gitcommand.SwitchNewBranch(ctx, repoDir, headBranch); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("gitcommand.SwitchNewBranch failed: %w", err)
 	}
 	if err := s.restoreFiles(ctx, repoDir, targetBaseBranch, changedFilepaths, environment); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("restoreFiles failed: %w", err)
 	}
 	if err := s.gitcommand.CommitAllAmend(ctx, repoDir); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("gitcommand.CommitAllAmend failed: %w", err)
 	}
 	if err := s.gitcommand.Push(ctx, repoDir); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("gitcommand.Push failed: %w", err)
 	}
 
 	//
@@ -157,10 +157,10 @@ func (s *GitHub) separatePullRequest(ctx context.Context,
 	prNum, err := s.githubapi.CreatePullRequest(ctx, org, repo, headBranch,
 		targetBaseBranch, title, "")
 	if err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("githubapi.CreatePullRequest failed: %w", err)
 	}
 	if err := s.githubapi.CreateLabels(ctx, org, repo, prNum, []string{"dependencies"}); err != nil {
-		return 0, xerrors.Errorf("message: %w", err)
+		return 0, xerrors.Errorf("githubapi.CreateLabels failed: %w", err)
 	}
 
 	return prNum, nil
@@ -182,7 +182,7 @@ func (s *GitHub) restoreFiles(ctx context.Context,
 		return xerrors.Errorf(`all of changedFilepaths don't contain "/%s/"`, environment)
 	}
 	if err := s.gitcommand.Restore(ctx, repoDir, sourceBranch, restoredFilePaths); err != nil {
-		return xerrors.Errorf("message: %w", err)
+		return xerrors.Errorf("gitcommand.Restore failed: %w", err)
 	}
 	return nil
 }

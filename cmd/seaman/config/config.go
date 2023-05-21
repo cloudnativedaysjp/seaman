@@ -36,6 +36,7 @@ func LoadConf(filename string) (*Config, error) {
 
 type Config struct {
 	Debug         bool                `json:"debug"`
+	StackTrace    bool                `json:"stacktrace"`
 	Slack         SlackConfig         `json:"slack" validate:"required"`
 	GitHub        GitHubConfig        `json:"github" validate:"required"`
 	GitHubWebhook GitHubWebhookConfig `json:"githubWebhook" validate:"required"`
