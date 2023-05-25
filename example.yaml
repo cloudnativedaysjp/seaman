@@ -1,10 +1,14 @@
 debug: false
+stacktrace: true
 slack:
   botToken: ${SLACK_BOT_TOKEN}
   appToken: ${SLACK_APP_TOKEN}
 github:
   username: ShotaKitazawa
   accessToken: ${GITHUB_ACCESS_TOKEN}
+githubWebhook:
+  bindAddr: ":8080"
+  secret: "thisissecret"
 release:
   targets:
   - url: https://github.com/ShotaKitazawa/kube-portal
