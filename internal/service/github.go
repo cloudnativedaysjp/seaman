@@ -1,4 +1,4 @@
-//go:generate go run github.com/golang/mock/mockgen -package mock -source=github_release.go -destination=mock/github_release.go
+//go:generate go run github.com/golang/mock/mockgen -package mock -source=github.go -destination=mock/github.go
 
 package service
 
@@ -107,7 +107,7 @@ func (s *GitHub) SeparatePullRequests(ctx context.Context,
 		return 0, 0, xerrors.Errorf("separatePullRequest(prod) failed: %w", err)
 	}
 
-	if err := s.githubapi.CreateIssueComment(ctx, org, repo, prNumProd, fmt.Sprintf(`Closes #%d`, prNum)); err != nil {
+	if err := s.githubapi.UpdatePullRequestBody(ctx, org, repo, prNumProd, fmt.Sprintf(`Closes #%d`, prNum)); err != nil {
 		return 0, 0, xerrors.Errorf("githubapi.CreateIssueComment failed: %w", err)
 	}
 
