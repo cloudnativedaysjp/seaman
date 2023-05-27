@@ -1,5 +1,5 @@
 # seaman
 
-SlackBot for CloudNativeDays!
+Chatbot for CloudNative Days!
 
 ![seaman](./images/icon.jpg)
