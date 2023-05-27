@@ -22,6 +22,7 @@ type GitHubApiClient interface {
 	DeleteBranch(ctx context.Context, org, repo, headBranch string) error
 	GetPullRequestTitleAndChangedFilepaths(ctx context.Context, org, repo string, prNum int) (string, []string, error)
 	HealthCheck() error
+	UpdatePullRequestBody(ctx context.Context, org, repo string, prNum int, body string) error
 }
 
 type GitHubApiClientImpl struct {
@@ -265,6 +266,31 @@ func (g *GitHubApiClientImpl) HealthCheck() error {
 	if err := client.Query(ctx, &q, nil); err != nil {
 		return xerrors.Errorf("%w", err)
 	}
+	return nil
+}
+
+func (g *GitHubApiClientImpl) UpdatePullRequestBody(ctx context.Context, org, repo string, prNum int, body string) error {
+	client := githubv4.NewClient(oauth2.NewClient(ctx, g.tokenSource))
+
+	prId, err := g.getPullRequestId(ctx, org, repo, prNum)
+	if err != nil {
+		return xerrors.Errorf("getRepositoryId failed: %w", err)
+	}
+
+	var mutation struct {
+		UpdatePullRequest struct {
+			PullRequest struct {
+				Number int
+			}
+		} `graphql:"updatePullRequest(input:$input)"`
+	}
+	if err := client.Mutate(ctx, &mutation, githubv4.UpdatePullRequestInput{
+		PullRequestID: prId,
+		Body:          githubv4.NewString(githubv4.String(body)),
+	}, nil); err != nil {
+		return err
+	}
+
 	return nil
 }
 
