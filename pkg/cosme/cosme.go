@@ -35,12 +35,14 @@ func New(logger *slog.Logger, secret string) (*handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &handler{
+	h := &handler{
 		make(chan data),
 		make(map[string]issueCommentHandler),
 		logger.With("package", "cosme"),
 		hook,
-	}, nil
+	}
+	go h.RunBackground()
+	return h, nil
 }
 
 func (h *handler) WithCommand(command string, handler issueCommentHandler) *handler {
