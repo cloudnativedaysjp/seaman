@@ -5,12 +5,18 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-playground/webhooks/v6/github"
 	"golang.org/x/exp/slog"
 
 	"github.com/cloudnativedaysjp/seaman/pkg/log"
 	"github.com/cloudnativedaysjp/seaman/pkg/utils"
+)
+
+const (
+	channelLength                     = 8
+	timeoutFromEnqueuedUntilProceeded = 20 * time.Second
 )
 
 type issueCommentHandler func(ctx context.Context, payload github.IssueCommentPayload, args []string) error
@@ -25,6 +31,7 @@ type handler struct {
 type data struct {
 	payload github.IssueCommentPayload
 	ctx     context.Context
+	cancel  context.CancelFunc
 }
 
 func New(logger *slog.Logger, secret string) (*handler, error) {
@@ -36,7 +43,7 @@ func New(logger *slog.Logger, secret string) (*handler, error) {
 		return nil, err
 	}
 	h := &handler{
-		make(chan data),
+		make(chan data, channelLength),
 		make(map[string]issueCommentHandler),
 		logger.With("package", "cosme"),
 		hook,
@@ -71,13 +78,12 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// hook handler
-
 	if len(strings.Fields(payload.Comment.Body)) == 0 {
 		h.log.Info("invalid command: args.length == 0")
 		return
 	}
-	h.c <- data{payload, r.Context()}
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutFromEnqueuedUntilProceeded)
+	h.c <- data{payload, ctx, cancel}
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -89,6 +95,7 @@ func (h *handler) RunBackground() {
 			h.log.Info("context has already exceeded")
 			continue
 		default:
+			d.cancel()
 		}
 
 		ctx := context.Background()
