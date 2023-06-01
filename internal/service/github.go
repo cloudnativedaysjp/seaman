@@ -42,7 +42,7 @@ func (s *GitHub) CreatePullRequestWithEmptyCommit(ctx context.Context,
 	targetBaseBranch string, headBranchSuffix string,
 ) (int, error) {
 	const (
-		emptyPrHeadBranchPrefix = "release/bot_"
+		emptyPrHeadBranchPrefix = "seaman/release_"
 	)
 	logger := log.FromContext(ctx)
 	headBranchName := emptyPrHeadBranchPrefix + headBranchSuffix

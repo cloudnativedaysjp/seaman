@@ -3,6 +3,7 @@
 package gitcommand
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -60,9 +61,9 @@ func (g *GitCommandClientImpl) Clone(ctx context.Context, org, repo string, opt 
 		downloadDir,
 	)
 	cmd := exec.CommandContext(ctx, commands[0], commands[1:]...)
-	stderr := cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return "", xerrors.Errorf("%v: %w", stderr, err)
+		return "", xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	return downloadDir, nil
 }
@@ -75,21 +76,21 @@ func (g *GitCommandClientImpl) CommitAll(ctx context.Context, dirPath, commitMsg
 	}
 	cmd = exec.CommandContext(ctx, "git", "config", "user.email", g.email)
 	cmd.Dir = dirPath
-	stderr := cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	cmd = exec.CommandContext(ctx, "git", "add", "-A")
 	cmd.Dir = dirPath
-	stderr = cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	cmd = exec.CommandContext(ctx, "git", "commit", "--allow-empty", "-m", commitMsg)
 	cmd.Dir = dirPath
-	stderr = cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	return nil
 }
@@ -97,28 +98,28 @@ func (g *GitCommandClientImpl) CommitAll(ctx context.Context, dirPath, commitMsg
 func (g *GitCommandClientImpl) CommitAllAmend(ctx context.Context, dirPath string) error {
 	cmd := exec.CommandContext(ctx, "git", "config", "user.name", g.user)
 	cmd.Dir = dirPath
-	stderr := cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	cmd = exec.CommandContext(ctx, "git", "config", "user.email", g.email)
 	cmd.Dir = dirPath
-	stderr = cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	cmd = exec.CommandContext(ctx, "git", "add", "-A")
 	cmd.Dir = dirPath
-	stderr = cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	cmd = exec.CommandContext(ctx,
 		"git", "commit", "--amend", "--no-edit", "--author", fmt.Sprintf("%s <%s>", g.user, g.email))
 	cmd.Dir = dirPath
-	stderr = cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	return nil
 }
@@ -130,9 +131,9 @@ func (g *GitCommandClientImpl) HealthCheck() (err error) {
 func (g *GitCommandClientImpl) Push(ctx context.Context, dirPath string) error {
 	cmd := exec.CommandContext(ctx, "git", "push", "origin", "HEAD")
 	cmd.Dir = dirPath
-	stderr := cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	return nil
 }
@@ -147,9 +148,9 @@ func (g *GitCommandClientImpl) Remove(ctx context.Context, dirPath string) error
 func (g *GitCommandClientImpl) Restore(ctx context.Context, dirPath, sourceBranch string, filePaths []string) error {
 	cmd := exec.CommandContext(ctx, "git", "restore", "-s", "origin/"+sourceBranch, strings.Join(filePaths, " "))
 	cmd.Dir = dirPath
-	stderr := cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 
 	return nil
@@ -158,9 +159,9 @@ func (g *GitCommandClientImpl) Restore(ctx context.Context, dirPath, sourceBranc
 func (g *GitCommandClientImpl) SwitchNewBranch(ctx context.Context, dirPath, branch string) error {
 	cmd := exec.CommandContext(ctx, "git", "switch", "-c", branch)
 	cmd.Dir = dirPath
-	stderr := cmd.Stderr
+	cmd.Stderr = &bytes.Buffer{}
 	if _, err := cmd.Output(); err != nil {
-		return xerrors.Errorf("%v: %w", stderr, err)
+		return xerrors.Errorf("%v: %w", cmd.Stderr, err)
 	}
 	return nil
 }
