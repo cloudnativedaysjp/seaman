@@ -1,10 +1,11 @@
-name: build container image
+name: build container image when tags are pushed
 
-on: push
+on:
+  push:
+    tags: ["*"]
 
 jobs:
   build:
-    if: github.event.pusher.name != 'dreamkast-cloudnativedays'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,23 +19,20 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # because of using public registry
+          aws-region: ap-northeast-1
 
-      - name: Login to Amazon ECR Public
-        id: login-ecr-public
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          registry-type: public
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: public.ecr.aws/f5j9d0q5/seaman
+          images: ${{ steps.login-ecr.outputs.registry }}/seaman
           tags: |
             type=sha,prefix=,format=long
             type=ref,event=branch
-            type=semver,pattern={{version}}
 
       - id: get-tag
         run: |
