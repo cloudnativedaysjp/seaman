@@ -3,76 +3,17 @@ name: GitOps for production
 on:
   push:
     tags:
-      - "v*.*.*"
+      - v*
 
 jobs:
-  gitops:
-    runs-on: ubuntu-latest
+  gitops-ecs:
+    uses: cloudnativedaysjp/reusable-workflows/.github/workflows/wc-update-ecs-manifest.yml@main
+    permissions:
+      id-token: write
+    with:
+      target-image: seaman
+      environment: prod
+    secrets:
+      APP_ID: ${{ secrets.APP_ID }}
+      APP_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
 
-    steps:
-      - uses: actions/checkout@v3
-      - uses: imranismail/setup-kustomize@v2
-
-      - name: Generate token
-        id: generate_token
-        uses: tibdex/github-app-token@v1
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
-
-      - name: Checkout dreamkast-infra
-        uses: actions/checkout@v3
-        with:
-          repository: cloudnativedaysjp/dreamkast-infra
-          path: dreamkast-infra
-          token: ${{ steps.generate_token.outputs.token }}
-
-      - id: get-tag
-        run: |
-          if [[ "${{ github.ref }}" =~ ^refs/tags/ ]]; then
-            echo "::set-output name=tag::$(echo ${{ github.ref }} | sed -e 's|^refs/tags/v\(.*\)$|\1|g')"
-          else
-            echo "::set-output name=tag::none"
-          fi
-
-      - name: Update Kubernetes manifests
-        working-directory: dreamkast-infra/manifests/app/seaman
-        run: |
-          kustomize edit set image public.ecr.aws/f5j9d0q5/seaman:${{ steps.get-tag.outputs.tag }}
-
-      - name: Commit files
-        working-directory: dreamkast-infra/
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git status
-          git add -A
-          git commit -am "Bump docker tag (${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA})"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ steps.generate_token.outputs.token }}
-          repository: cloudnativedaysjp/dreamkast-infra
-          directory: dreamkast-infra
-          branch: production/seaman-main
-
-      - name: Create and Merge Pull Request
-        uses: "actions/github-script@v6"
-        with:
-          github-token: ${{ steps.generate_token.outputs.token }}
-          script: |
-            const pr = await github.rest.pulls.create({
-              owner: "cloudnativedaysjp",
-              repo: "dreamkast-infra",
-              title: "Automated PR (production/seaman-main)",
-              body: "**this PR is automatically created & merged**",
-              head: "production/seaman-main",
-              base: "main"
-            });
-            await github.rest.pulls.merge({
-              owner: "cloudnativedaysjp",
-              repo: "dreamkast-infra",
-              pull_number: pr.data.number,
-              merge_method: "squash",
-            });
