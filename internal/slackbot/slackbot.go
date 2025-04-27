@@ -14,6 +14,7 @@ import (
 	pb "github.com/cloudnativedaysjp/emtec-ecu/pkg/ws-proxy/schema"
 
 	"github.com/cloudnativedaysjp/seaman/cmd/seaman/config"
+	"github.com/cloudnativedaysjp/seaman/internal/infra/aws"
 	cndoperationserver "github.com/cloudnativedaysjp/seaman/internal/infra/emtec-ecu"
 	"github.com/cloudnativedaysjp/seaman/internal/infra/gitcommand"
 	"github.com/cloudnativedaysjp/seaman/internal/infra/githubapi"
@@ -55,6 +56,13 @@ func Run(ctx context.Context, conf *config.Config) error {
 	slackFactory := infra_slack.NewSlackClientFactory()
 	githubApiClient := githubapi.NewGitHubApiClientImpl(conf.GitHub.AccessToken)
 	gitCommandClient := gitcommand.NewGitCommandClientImpl(conf.GitHub.Username, conf.GitHub.AccessToken)
+	
+	// Initialize AWS client
+	awsClient, err := aws.NewAwsClient()
+	if err != nil {
+		logger.Warn(fmt.Sprintf("cannot initialize AWS client, skipped: %v", err))
+	}
+	
 	var cndClient *cndoperationserver.CndWrapper
 	if conf.Emtec.EndpointUrl != "" {
 		func() {
@@ -111,6 +119,17 @@ func Run(ctx context.Context, conf *config.Config) error {
 		r.HandleInteractionBlockAction(
 			api.ActIdEmtec_SceneNext, c.UpdateSceneToNext)
 	}
+	if awsClient != nil { // aws
+		c := controller.NewAwsController(logger,
+			slackFactory,
+			awsClient,
+			conf.Aws.RdsInstance,
+			conf.Aws.EcsCluster)
+		r.HandleMentionedMessage(
+			"start-staging", c.StartStaging).
+			WithURL("https://github.com/cloudnativedaysjp/seaman/blob/main/docs/aws.md")
+	}
+
 	{ // common
 		c := controller.NewCommonController(logger,
 			slackFactory)

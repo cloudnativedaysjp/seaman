@@ -42,6 +42,7 @@ type Config struct {
 	GitHubWebhook GitHubWebhookConfig `json:"githubWebhook" validate:"required"`
 	Release       ReleaseConfig       `json:"release" validate:"required"`
 	Emtec         EmtecConfig         `json:"emtec"`
+	Aws           AwsConfig           `json:"aws"`
 }
 
 // for each external service
@@ -74,4 +75,9 @@ type ReleaseTarget struct {
 
 type EmtecConfig struct {
 	EndpointUrl string `json:"endpointUrl"`
+}
+
+type AwsConfig struct {
+	RdsInstance string `json:"rdsInstance"`
+	EcsCluster  string `json:"ecsCluster"`
 }
