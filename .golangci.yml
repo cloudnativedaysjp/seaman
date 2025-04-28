@@ -3,29 +3,33 @@ linters:
   default: none
   enable:
     - bodyclose
-    # - depguard
+    - copyloopvar
+    #- depguard
+    #- dogsled
     - dupl
     - errcheck
+    - errorlint
+    #- funlen
+    - gocheckcompilerdirectives
     - gochecknoinits
     - goconst
     - gocritic
     - gocyclo
-    - gofmt
-    - goimports
-    # - gomnd
+    #- godox
+    #- mnd
     - goprintffuncname
-    # - gosec
-    - gosimple
+    #- gosec
     - govet
+    - intrange
     - ineffassign
+    #- lll
     - misspell
     - nakedret
     - noctx
     - nolintlint
-    # - revive
+    #- revive
     - staticcheck
-    # - stylecheck
-    - typecheck
+    - testifylint
     - unconvert
     - unparam
     - unused
