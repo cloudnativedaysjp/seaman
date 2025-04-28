@@ -32,7 +32,7 @@ func Test_showVersion(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }

@@ -45,7 +45,7 @@ func (m *MockGitHubApiClient) CheckPrIsForInfraAndCreatedByRenovate(ctx context.
 }
 
 // CheckPrIsForInfraAndCreatedByRenovate indicates an expected call of CheckPrIsForInfraAndCreatedByRenovate.
-func (mr *MockGitHubApiClientMockRecorder) CheckPrIsForInfraAndCreatedByRenovate(ctx, org, repo, prNum interface{}) *gomock.Call {
+func (mr *MockGitHubApiClientMockRecorder) CheckPrIsForInfraAndCreatedByRenovate(ctx, org, repo, prNum any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckPrIsForInfraAndCreatedByRenovate", reflect.TypeOf((*MockGitHubApiClient)(nil).CheckPrIsForInfraAndCreatedByRenovate), ctx, org, repo, prNum)
 }
@@ -59,7 +59,7 @@ func (m *MockGitHubApiClient) CreateIssueComment(ctx context.Context, org, repo 
 }
 
 // CreateIssueComment indicates an expected call of CreateIssueComment.
-func (mr *MockGitHubApiClientMockRecorder) CreateIssueComment(ctx, org, repo, prNum, body interface{}) *gomock.Call {
+func (mr *MockGitHubApiClientMockRecorder) CreateIssueComment(ctx, org, repo, prNum, body any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIssueComment", reflect.TypeOf((*MockGitHubApiClient)(nil).CreateIssueComment), ctx, org, repo, prNum, body)
 }
@@ -73,7 +73,7 @@ func (m *MockGitHubApiClient) CreateLabels(ctx context.Context, org, repo string
 }
 
 // CreateLabels indicates an expected call of CreateLabels.
-func (mr *MockGitHubApiClientMockRecorder) CreateLabels(ctx, org, repo, prNum, labels interface{}) *gomock.Call {
+func (mr *MockGitHubApiClientMockRecorder) CreateLabels(ctx, org, repo, prNum, labels any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLabels", reflect.TypeOf((*MockGitHubApiClient)(nil).CreateLabels), ctx, org, repo, prNum, labels)
 }
@@ -88,7 +88,7 @@ func (m *MockGitHubApiClient) CreatePullRequest(ctx context.Context, org, repo, 
 }
 
 // CreatePullRequest indicates an expected call of CreatePullRequest.
-func (mr *MockGitHubApiClientMockRecorder) CreatePullRequest(ctx, org, repo, headBranch, baseBranch, title, body interface{}) *gomock.Call {
+func (mr *MockGitHubApiClientMockRecorder) CreatePullRequest(ctx, org, repo, headBranch, baseBranch, title, body any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePullRequest", reflect.TypeOf((*MockGitHubApiClient)(nil).CreatePullRequest), ctx, org, repo, headBranch, baseBranch, title, body)
 }
@@ -102,7 +102,7 @@ func (m *MockGitHubApiClient) DeleteBranch(ctx context.Context, org, repo, headB
 }
 
 // DeleteBranch indicates an expected call of DeleteBranch.
-func (mr *MockGitHubApiClientMockRecorder) DeleteBranch(ctx, org, repo, headBranch interface{}) *gomock.Call {
+func (mr *MockGitHubApiClientMockRecorder) DeleteBranch(ctx, org, repo, headBranch any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBranch", reflect.TypeOf((*MockGitHubApiClient)(nil).DeleteBranch), ctx, org, repo, headBranch)
 }
@@ -118,7 +118,7 @@ func (m *MockGitHubApiClient) GetPullRequestTitleAndChangedFilepaths(ctx context
 }
 
 // GetPullRequestTitleAndChangedFilepaths indicates an expected call of GetPullRequestTitleAndChangedFilepaths.
-func (mr *MockGitHubApiClientMockRecorder) GetPullRequestTitleAndChangedFilepaths(ctx, org, repo, prNum interface{}) *gomock.Call {
+func (mr *MockGitHubApiClientMockRecorder) GetPullRequestTitleAndChangedFilepaths(ctx, org, repo, prNum any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPullRequestTitleAndChangedFilepaths", reflect.TypeOf((*MockGitHubApiClient)(nil).GetPullRequestTitleAndChangedFilepaths), ctx, org, repo, prNum)
 }
@@ -146,7 +146,7 @@ func (m *MockGitHubApiClient) UpdatePullRequestBody(ctx context.Context, org, re
 }
 
 // UpdatePullRequestBody indicates an expected call of UpdatePullRequestBody.
-func (mr *MockGitHubApiClientMockRecorder) UpdatePullRequestBody(ctx, org, repo, prNum, body interface{}) *gomock.Call {
+func (mr *MockGitHubApiClientMockRecorder) UpdatePullRequestBody(ctx, org, repo, prNum, body any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePullRequestBody", reflect.TypeOf((*MockGitHubApiClient)(nil).UpdatePullRequestBody), ctx, org, repo, prNum, body)
 }

@@ -68,7 +68,7 @@ func (g *GitHubApiClientImpl) CheckPrIsForInfraAndCreatedByRenovate(ctx context.
 			} `graphql:"pullRequest(number:$number)"`
 		} `graphql:"repository(owner:$repositoryOwner,name:$repositoryName)"`
 	}
-	queryVars := map[string]interface{}{
+	queryVars := map[string]any{
 		"repositoryOwner": githubv4.String(org),
 		"repositoryName":  githubv4.String(repo),
 		"number":          githubv4.Int(prNum),
@@ -85,7 +85,7 @@ func (g *GitHubApiClientImpl) CheckPrIsForInfraAndCreatedByRenovate(ctx context.
 	}
 	// if path of changed file contains "/development/" or "/production/"
 	fpath := string(query.Repository.PullRequest.Files.Edges[0].Node.Path)
-	if !(strings.Contains(fpath, "/development/") || strings.Contains(fpath, "/production/")) {
+	if !strings.Contains(fpath, "/development/") && !strings.Contains(fpath, "/production/") {
 		logger.Info(`path of changed file does contain neither "/development/" "/production/"`)
 		return false, "", nil
 	}
@@ -227,7 +227,7 @@ func (g *GitHubApiClientImpl) GetPullRequestTitleAndChangedFilepaths(ctx context
 			} `graphql:"pullRequest(number:$pullRequestNumber)"`
 		} `graphql:"repository(owner:$repositoryOwner,name:$repositoryName)"`
 	}
-	queryVars := map[string]interface{}{
+	queryVars := map[string]any{
 		"repositoryOwner":   githubv4.String(org),
 		"repositoryName":    githubv4.String(repo),
 		"pullRequestNumber": githubv4.Int(prNum),
@@ -307,7 +307,7 @@ func (g *GitHubApiClientImpl) getBranchId(ctx context.Context, org, repo, branch
 			} `graphql:"ref(qualifiedName:$qualifiedName)"`
 		} `graphql:"repository(owner:$repositoryOwner,name:$repositoryName)"`
 	}
-	if err := client.Query(ctx, &queryGetBranchID, map[string]interface{}{
+	if err := client.Query(ctx, &queryGetBranchID, map[string]any{
 		"repositoryOwner": githubv4.String(org),
 		"repositoryName":  githubv4.String(repo),
 		"qualifiedName":   githubv4.String(branch),
@@ -326,7 +326,7 @@ func (g *GitHubApiClientImpl) getLabelId(ctx context.Context, org, repo, label s
 			} `graphql:"label(name:$labelName)"`
 		} `graphql:"repository(owner:$repositoryOwner,name:$repositoryName)"`
 	}
-	if err := client.Query(ctx, &queryGetLabel, map[string]interface{}{
+	if err := client.Query(ctx, &queryGetLabel, map[string]any{
 		"repositoryOwner": githubv4.String(org),
 		"repositoryName":  githubv4.String(repo),
 		"labelName":       githubv4.String(label),
@@ -348,7 +348,7 @@ func (g *GitHubApiClientImpl) getPullRequestId(ctx context.Context, org, repo st
 			} `graphql:"pullRequest(number:$pullRequestNumber)"`
 		} `graphql:"repository(owner:$repositoryOwner,name:$repositoryName)"`
 	}
-	if err := client.Query(ctx, &queryGetPullRequest, map[string]interface{}{
+	if err := client.Query(ctx, &queryGetPullRequest, map[string]any{
 		"repositoryOwner":   githubv4.String(org),
 		"repositoryName":    githubv4.String(repo),
 		"pullRequestNumber": githubv4.Int(prNum),
@@ -365,7 +365,7 @@ func (g *GitHubApiClientImpl) getRepositoryId(ctx context.Context, org, repo str
 			ID githubv4.String
 		} `graphql:"repository(owner:$repositoryOwner,name:$repositoryName)"`
 	}
-	if err := client.Query(ctx, &queryGetRepository, map[string]interface{}{
+	if err := client.Query(ctx, &queryGetRepository, map[string]any{
 		"repositoryOwner": githubv4.String(org),
 		"repositoryName":  githubv4.String(repo),
 	}); err != nil {

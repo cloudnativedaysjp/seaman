@@ -1,45 +1,46 @@
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
     - bodyclose
-    # - depguard
+    - copyloopvar
+    #- depguard
+    #- dogsled
     - dupl
     - errcheck
-    - exportloopref
+    - errorlint
+    #- funlen
+    - gocheckcompilerdirectives
     - gochecknoinits
     - goconst
     - gocritic
     - gocyclo
-    - gofmt
-    - goimports
-    # - gomnd
+    #- godox
+    #- mnd
     - goprintffuncname
-    # - gosec
-    - gosimple
+    #- gosec
     - govet
+    - intrange
     - ineffassign
+    #- lll
     - misspell
     - nakedret
     - noctx
     - nolintlint
-    # - revive
+    #- revive
     - staticcheck
-    # - stylecheck
-    - typecheck
+    - testifylint
     - unconvert
     - unparam
     - unused
     - whitespace
-  fast: true
 
-linters-settings:
-  nolintlint:
-    allow-unused: false
-    allow-leading-space: false
-    require-specific: true
-
-run:
-  timeout: 10m
-  skip-files:
-  - "zz_generated.*\\.go$"
-  allow-parallel-runners: true
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      rewrite-rules:
+        - pattern: 'interface{}'
+          replacement: 'any'

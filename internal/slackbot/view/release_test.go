@@ -78,7 +78,7 @@ func Test_releaseListRepo(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }
@@ -155,7 +155,7 @@ func Test_releaseListLevel(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }
@@ -214,7 +214,7 @@ func Test_releaseConfirmation(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }
@@ -249,7 +249,7 @@ func Test_releaseProcessing(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }
@@ -301,7 +301,7 @@ func Test_releaseDisplayPrLink(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }

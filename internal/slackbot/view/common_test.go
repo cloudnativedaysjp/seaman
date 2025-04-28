@@ -32,7 +32,7 @@ func Test_showCommands(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }
@@ -68,7 +68,7 @@ func Test_somethingIsWrong(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }
@@ -104,7 +104,7 @@ func Test_canceled(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }

@@ -44,7 +44,7 @@ func (m *MockSlackClient) PostMessage(ctx context.Context, channel string, msg s
 }
 
 // PostMessage indicates an expected call of PostMessage.
-func (mr *MockSlackClientMockRecorder) PostMessage(ctx, channel, msg interface{}) *gomock.Call {
+func (mr *MockSlackClientMockRecorder) PostMessage(ctx, channel, msg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostMessage", reflect.TypeOf((*MockSlackClient)(nil).PostMessage), ctx, channel, msg)
 }
@@ -58,7 +58,7 @@ func (m *MockSlackClient) PostMessageToThread(ctx context.Context, channel, ts s
 }
 
 // PostMessageToThread indicates an expected call of PostMessageToThread.
-func (mr *MockSlackClientMockRecorder) PostMessageToThread(ctx, channel, ts, msg interface{}) *gomock.Call {
+func (mr *MockSlackClientMockRecorder) PostMessageToThread(ctx, channel, ts, msg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostMessageToThread", reflect.TypeOf((*MockSlackClient)(nil).PostMessageToThread), ctx, channel, ts, msg)
 }
@@ -72,7 +72,7 @@ func (m *MockSlackClient) UpdateMessage(ctx context.Context, channel, ts string,
 }
 
 // UpdateMessage indicates an expected call of UpdateMessage.
-func (mr *MockSlackClientMockRecorder) UpdateMessage(ctx, channel, ts, msg interface{}) *gomock.Call {
+func (mr *MockSlackClientMockRecorder) UpdateMessage(ctx, channel, ts, msg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMessage", reflect.TypeOf((*MockSlackClient)(nil).UpdateMessage), ctx, channel, ts, msg)
 }
