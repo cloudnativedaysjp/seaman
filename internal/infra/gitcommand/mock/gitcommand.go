@@ -45,7 +45,7 @@ func (m *MockGitCommandClient) Clone(ctx context.Context, org, repo string, opt 
 }
 
 // Clone indicates an expected call of Clone.
-func (mr *MockGitCommandClientMockRecorder) Clone(ctx, org, repo, opt interface{}) *gomock.Call {
+func (mr *MockGitCommandClientMockRecorder) Clone(ctx, org, repo, opt any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Clone", reflect.TypeOf((*MockGitCommandClient)(nil).Clone), ctx, org, repo, opt)
 }
@@ -59,7 +59,7 @@ func (m *MockGitCommandClient) CommitAll(ctx context.Context, dirPath, commitMsg
 }
 
 // CommitAll indicates an expected call of CommitAll.
-func (mr *MockGitCommandClientMockRecorder) CommitAll(ctx, dirPath, commitMsg interface{}) *gomock.Call {
+func (mr *MockGitCommandClientMockRecorder) CommitAll(ctx, dirPath, commitMsg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CommitAll", reflect.TypeOf((*MockGitCommandClient)(nil).CommitAll), ctx, dirPath, commitMsg)
 }
@@ -73,7 +73,7 @@ func (m *MockGitCommandClient) CommitAllAmend(ctx context.Context, dirPath strin
 }
 
 // CommitAllAmend indicates an expected call of CommitAllAmend.
-func (mr *MockGitCommandClientMockRecorder) CommitAllAmend(ctx, dirPath interface{}) *gomock.Call {
+func (mr *MockGitCommandClientMockRecorder) CommitAllAmend(ctx, dirPath any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CommitAllAmend", reflect.TypeOf((*MockGitCommandClient)(nil).CommitAllAmend), ctx, dirPath)
 }
@@ -101,7 +101,7 @@ func (m *MockGitCommandClient) Push(ctx context.Context, dirPath string) error {
 }
 
 // Push indicates an expected call of Push.
-func (mr *MockGitCommandClientMockRecorder) Push(ctx, dirPath interface{}) *gomock.Call {
+func (mr *MockGitCommandClientMockRecorder) Push(ctx, dirPath any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockGitCommandClient)(nil).Push), ctx, dirPath)
 }
@@ -115,7 +115,7 @@ func (m *MockGitCommandClient) Remove(ctx context.Context, dirPath string) error
 }
 
 // Remove indicates an expected call of Remove.
-func (mr *MockGitCommandClientMockRecorder) Remove(ctx, dirPath interface{}) *gomock.Call {
+func (mr *MockGitCommandClientMockRecorder) Remove(ctx, dirPath any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*MockGitCommandClient)(nil).Remove), ctx, dirPath)
 }
@@ -129,7 +129,7 @@ func (m *MockGitCommandClient) Restore(ctx context.Context, dirPath, sourceBranc
 }
 
 // Restore indicates an expected call of Restore.
-func (mr *MockGitCommandClientMockRecorder) Restore(ctx, dirPath, sourceBranch, filePaths interface{}) *gomock.Call {
+func (mr *MockGitCommandClientMockRecorder) Restore(ctx, dirPath, sourceBranch, filePaths any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Restore", reflect.TypeOf((*MockGitCommandClient)(nil).Restore), ctx, dirPath, sourceBranch, filePaths)
 }
@@ -143,7 +143,7 @@ func (m *MockGitCommandClient) SwitchNewBranch(ctx context.Context, dirPath, bra
 }
 
 // SwitchNewBranch indicates an expected call of SwitchNewBranch.
-func (mr *MockGitCommandClientMockRecorder) SwitchNewBranch(ctx, dirPath, branch interface{}) *gomock.Call {
+func (mr *MockGitCommandClientMockRecorder) SwitchNewBranch(ctx, dirPath, branch any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SwitchNewBranch", reflect.TypeOf((*MockGitCommandClient)(nil).SwitchNewBranch), ctx, dirPath, branch)
 }

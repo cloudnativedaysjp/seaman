@@ -57,14 +57,14 @@ func InvalidArguments(messageTs, message string) slack.Msg {
 
 func invalidArguments(messageTs, message string) (slack.Msg, error) {
 	return castFromMapToMsg(
-		map[string]interface{}{
-			"attachments": []interface{}{
-				map[string]interface{}{
+		map[string]any{
+			"attachments": []any{
+				map[string]any{
 					"color": colorCrimson,
-					"blocks": []interface{}{
-						map[string]interface{}{
+					"blocks": []any{
+						map[string]any{
 							"type": "section",
-							"text": map[string]interface{}{
+							"text": map[string]any{
 								"type": "mrkdwn",
 								"text": fmt.Sprintf("*InvalidArguments*\n"+
 									"%s (messageTs: `%s`)", message, messageTs),
@@ -84,14 +84,14 @@ func SomethingIsWrong(messageTs string) slack.Msg {
 
 func somethingIsWrong(messageTs string) (slack.Msg, error) {
 	return castFromMapToMsg(
-		map[string]interface{}{
-			"attachments": []interface{}{
-				map[string]interface{}{
+		map[string]any{
+			"attachments": []any{
+				map[string]any{
 					"color": colorCrimson,
-					"blocks": []interface{}{
-						map[string]interface{}{
+					"blocks": []any{
+						map[string]any{
 							"type": "section",
-							"text": map[string]interface{}{
+							"text": map[string]any{
 								"type": "mrkdwn",
 								"text": fmt.Sprintf("*InternalServerError*\n"+
 									"Please confirm to application log (messageTs: `%s`)", messageTs),

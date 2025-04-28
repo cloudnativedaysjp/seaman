@@ -87,7 +87,7 @@ func (c *EmtecController) switchAutomation(ctx context.Context, ev *slackevents.
 	}
 	// parse arguments
 	s := strings.Fields(ev.Text)
-	if !(len(s) >= 4) {
+	if len(s) < 4 {
 		msg := "args.length must be greater than 2"
 		logger.Debug(fmt.Sprintf("invalid input: %v", msg))
 		_ = sc.PostMessage(ctx, channelId, view.InvalidArguments(messageTs, msg))

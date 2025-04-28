@@ -15,7 +15,7 @@ const (
 	colorHhaki       = "#f0e68c"
 )
 
-func castFromMapToMsg(m map[string]interface{}) (slack.Msg, error) {
+func castFromMapToMsg(m map[string]any) (slack.Msg, error) {
 	b, err := json.Marshal(m)
 	if err != nil {
 		return slack.Msg{}, err

@@ -1,6 +1,8 @@
 module github.com/cloudnativedaysjp/seaman
 
-go 1.24
+go 1.23.0
+
+toolchain go1.23.4
 
 require (
 	github.com/cloudnativedaysjp/emtec-ecu v0.2.0

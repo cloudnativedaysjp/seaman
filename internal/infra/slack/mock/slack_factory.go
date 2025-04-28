@@ -45,7 +45,7 @@ func (m *MockSlackClientFactory) New(client slack0.Client) (slack.SlackClient, e
 }
 
 // New indicates an expected call of New.
-func (mr *MockSlackClientFactoryMockRecorder) New(client interface{}) *gomock.Call {
+func (mr *MockSlackClientFactoryMockRecorder) New(client any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockSlackClientFactory)(nil).New), client)
 }

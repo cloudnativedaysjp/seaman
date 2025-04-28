@@ -44,7 +44,7 @@ func (m *MockGitHubIface) CreatePullRequestWithEmptyCommit(ctx context.Context, 
 }
 
 // CreatePullRequestWithEmptyCommit indicates an expected call of CreatePullRequestWithEmptyCommit.
-func (mr *MockGitHubIfaceMockRecorder) CreatePullRequestWithEmptyCommit(ctx, org, repo, level, targetBaseBranch, headBranchSuffix interface{}) *gomock.Call {
+func (mr *MockGitHubIfaceMockRecorder) CreatePullRequestWithEmptyCommit(ctx, org, repo, level, targetBaseBranch, headBranchSuffix any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePullRequestWithEmptyCommit", reflect.TypeOf((*MockGitHubIface)(nil).CreatePullRequestWithEmptyCommit), ctx, org, repo, level, targetBaseBranch, headBranchSuffix)
 }
@@ -60,7 +60,7 @@ func (m *MockGitHubIface) SeparatePullRequests(ctx context.Context, org, repo st
 }
 
 // SeparatePullRequests indicates an expected call of SeparatePullRequests.
-func (mr *MockGitHubIfaceMockRecorder) SeparatePullRequests(ctx, org, repo, prNum, targetBaseBranch, prBranch interface{}) *gomock.Call {
+func (mr *MockGitHubIfaceMockRecorder) SeparatePullRequests(ctx, org, repo, prNum, targetBaseBranch, prBranch any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SeparatePullRequests", reflect.TypeOf((*MockGitHubIface)(nil).SeparatePullRequests), ctx, org, repo, prNum, targetBaseBranch, prBranch)
 }

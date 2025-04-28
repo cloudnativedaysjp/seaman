@@ -31,33 +31,33 @@ func releaseListRepo(repoUrls []string) (slack.Msg, error) {
 	}
 
 	return castFromMapToMsg(
-		map[string]interface{}{
-			"attachments": []interface{}{
-				map[string]interface{}{
+		map[string]any{
+			"attachments": []any{
+				map[string]any{
 					"color": colorLightGray,
-					"blocks": []interface{}{
-						map[string]interface{}{
+					"blocks": []any{
+						map[string]any{
 							"type": "section",
-							"text": map[string]interface{}{
+							"text": map[string]any{
 								"type": "plain_text",
 								"text": "リリース対象のリポジトリを選択",
 							},
 						},
-						map[string]interface{}{
+						map[string]any{
 							"type": "actions",
-							"elements": []interface{}{
-								map[string]interface{}{
+							"elements": []any{
+								map[string]any{
 									"type": "static_select",
-									"placeholder": map[string]interface{}{
+									"placeholder": map[string]any{
 										"type": "plain_text",
 										"text": "Select an item",
 									},
 									"action_id": api.ActIdRelease_SelectedRepository,
 									"options":   options,
 								},
-								map[string]interface{}{
+								map[string]any{
 									"type": "button",
-									"text": map[string]interface{}{
+									"text": map[string]any{
 										"type": "plain_text",
 										"text": "Cancel",
 									},
@@ -80,51 +80,51 @@ func ReleaseListLevel(orgRepo api.OrgRepo) slack.Msg {
 
 func releaseListLevel(orgRepo api.OrgRepo) (slack.Msg, error) {
 	return castFromMapToMsg(
-		map[string]interface{}{
-			"attachments": []interface{}{
-				map[string]interface{}{
+		map[string]any{
+			"attachments": []any{
+				map[string]any{
 					"color": colorLightGray,
-					"blocks": []interface{}{
-						map[string]interface{}{
+					"blocks": []any{
+						map[string]any{
 							"type": "section",
-							"text": map[string]interface{}{
+							"text": map[string]any{
 								"text": "更新レベルを選択",
 								"type": "plain_text",
 							},
 						},
-						map[string]interface{}{
+						map[string]any{
 							"type": "actions",
-							"elements": []interface{}{
-								map[string]interface{}{
+							"elements": []any{
+								map[string]any{
 									"type": "button",
-									"text": map[string]interface{}{
+									"text": map[string]any{
 										"type": "plain_text",
 										"text": api.CallbackValueRelease_VersionMajor,
 									},
 									"action_id": api.ActIdRelease_SelectedLevelMajor,
 									"value":     orgRepo.WithLevel(api.CallbackValueRelease_VersionMajor).String(),
 								},
-								map[string]interface{}{
+								map[string]any{
 									"type": "button",
-									"text": map[string]interface{}{
+									"text": map[string]any{
 										"text": api.CallbackValueRelease_VersionMinor,
 										"type": "plain_text",
 									},
 									"action_id": api.ActIdRelease_SelectedLevelMinor,
 									"value":     orgRepo.WithLevel(api.CallbackValueRelease_VersionMinor).String(),
 								},
-								map[string]interface{}{
+								map[string]any{
 									"type": "button",
-									"text": map[string]interface{}{
+									"text": map[string]any{
 										"type": "plain_text",
 										"text": api.CallbackValueRelease_VersionPatch,
 									},
 									"action_id": api.ActIdRelease_SelectedLevelPatch,
 									"value":     orgRepo.WithLevel(api.CallbackValueRelease_VersionPatch).String(),
 								},
-								map[string]interface{}{
+								map[string]any{
 									"type": "button",
-									"text": map[string]interface{}{
+									"text": map[string]any{
 										"type": "plain_text",
 										"text": "Cancel",
 									},
@@ -149,35 +149,35 @@ func releaseConfirmation(orgRepoLevel api.OrgRepoLevel) (slack.Msg, error) {
 	org := orgRepoLevel.Org()
 	repo := orgRepoLevel.Repo()
 	level := orgRepoLevel.Level()
-	return castFromMapToMsg(map[string]interface{}{
-		"attachments": []interface{}{
-			map[string]interface{}{
+	return castFromMapToMsg(map[string]any{
+		"attachments": []any{
+			map[string]any{
 				"color": colorLightGray,
-				"blocks": []interface{}{
-					map[string]interface{}{
+				"blocks": []any{
+					map[string]any{
 						"type": "section",
-						"text": map[string]interface{}{
+						"text": map[string]any{
 							"type": "mrkdwn",
 							"text": fmt.Sprintf(
 								"OK? > Target: *%s/%s*, Update Level: *%s*", org, repo, level,
 							),
 						},
 					},
-					map[string]interface{}{
+					map[string]any{
 						"type": "actions",
-						"elements": []interface{}{
-							map[string]interface{}{
+						"elements": []any{
+							map[string]any{
 								"type": "button",
-								"text": map[string]interface{}{
+								"text": map[string]any{
 									"type": "plain_text",
 									"text": "OK",
 								},
 								"action_id": api.ActIdRelease_OK,
 								"value":     orgRepoLevel.String(),
 							},
-							map[string]interface{}{
+							map[string]any{
 								"type": "button",
-								"text": map[string]interface{}{
+								"text": map[string]any{
 									"type": "plain_text",
 									"text": "Cancel",
 								},
@@ -227,30 +227,30 @@ func releaseDisplayPrLink(orgRepoLevel api.OrgRepoLevel, prNumber int) (slack.Ms
 	org := orgRepoLevel.Org()
 	repo := orgRepoLevel.Repo()
 	level := orgRepoLevel.Level()
-	return castFromMapToMsg(map[string]interface{}{
-		"attachments": []interface{}{
-			map[string]interface{}{
+	return castFromMapToMsg(map[string]any{
+		"attachments": []any{
+			map[string]any{
 				"color": colorDeepSkyBlue,
-				"blocks": []interface{}{
-					map[string]interface{}{
+				"blocks": []any{
+					map[string]any{
 						"type": "section",
-						"fields": []interface{}{
-							map[string]interface{}{
+						"fields": []any{
+							map[string]any{
 								"type": "mrkdwn",
 								"text": fmt.Sprintf("Target: *%s/%s*", org, repo),
 							},
-							map[string]interface{}{
+							map[string]any{
 								"type": "mrkdwn",
 								"text": fmt.Sprintf("Update Level: *%s*", level),
 							},
 						},
 					},
-					map[string]interface{}{
+					map[string]any{
 						"type": "divider",
 					},
-					map[string]interface{}{
+					map[string]any{
 						"type": "section",
-						"text": map[string]interface{}{
+						"text": map[string]any{
 							"type": "mrkdwn",
 							"text": fmt.Sprintf(":github: <%s>", orgRepoLevel.PullRequestUrl(prNumber)),
 						},
