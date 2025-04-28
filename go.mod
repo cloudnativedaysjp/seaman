@@ -2,26 +2,26 @@ module github.com/cloudnativedaysjp/seaman
 
 go 1.23.0
 
-toolchain go1.23.4
+toolchain go1.24.2
 
 require (
 	github.com/cloudnativedaysjp/emtec-ecu v0.2.0
-	github.com/creasty/defaults v1.7.0
-	github.com/go-chi/chi/v5 v5.0.10
-	github.com/go-playground/validator/v10 v10.14.1
-	github.com/go-playground/webhooks/v6 v6.2.0
+	github.com/creasty/defaults v1.8.0
+	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-playground/validator/v10 v10.26.0
+	github.com/go-playground/webhooks/v6 v6.4.0
 	github.com/golang/mock v1.6.0
 	github.com/golangci/golangci-lint v1.64.8
 	github.com/google/go-cmp v0.7.0
-	github.com/shurcooL/githubv4 v0.0.0-20230704064427-599ae7bbf278
-	github.com/slack-go/slack v0.12.2
-	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0
-	golang.org/x/oauth2 v0.28.0
+	github.com/shurcooL/githubv4 v0.0.0-20240727222349-48295856cce7
+	github.com/slack-go/slack v0.16.0
+	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0
+	golang.org/x/oauth2 v0.29.0
 	golang.org/x/sync v0.13.0
-	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
-	google.golang.org/grpc v1.71.0
+	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da
+	google.golang.org/grpc v1.72.0
 	google.golang.org/protobuf v1.36.6
-	sigs.k8s.io/yaml v1.3.0
+	sigs.k8s.io/yaml v1.4.0
 )
 
 require (
@@ -70,7 +70,7 @@ require (
 	github.com/firefart/nonamedreturns v1.0.6 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/fzipp/gocyclo v0.6.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/ghostiam/protogetter v0.3.15 // indirect
 	github.com/go-critic/go-critic v0.13.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -121,7 +121,7 @@ require (
 	github.com/ldez/grignotin v0.9.0 // indirect
 	github.com/ldez/tagliatelle v0.7.1 // indirect
 	github.com/ldez/usetesting v0.4.3 // indirect
-	github.com/leodido/go-urn v1.2.4 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/leonklingele/grouper v1.1.2 // indirect
 	github.com/macabu/inamedparam v0.2.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
