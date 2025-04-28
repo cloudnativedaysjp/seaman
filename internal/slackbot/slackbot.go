@@ -58,7 +58,7 @@ func Run(ctx context.Context, conf *config.Config) error {
 	var cndClient *cndoperationserver.CndWrapper
 	if conf.Emtec.EndpointUrl != "" {
 		func() {
-			conn, err := grpc.Dial(conf.Emtec.EndpointUrl,
+			conn, err := grpc.NewClient(conf.Emtec.EndpointUrl,
 				grpc.WithTransportCredentials(insecure.NewCredentials()), // TODO (cloudnativedaysjp/emtec-ecu#7)
 			)
 			if err != nil {

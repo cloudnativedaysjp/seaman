@@ -47,7 +47,7 @@ func Test_emtecListTrack(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }
@@ -297,7 +297,7 @@ func Test_EmtecMovedToNextScene(t *testing.T) {
 			return
 		}
 		if diff := cmp.Diff(expected, got); diff != "" {
-			t.Errorf(diff)
+			t.Error(diff)
 		}
 	})
 }
