@@ -11,7 +11,7 @@ require (
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/go-playground/webhooks/v6 v6.2.0
 	github.com/golang/mock v1.6.0
-	github.com/golangci/golangci-lint v1.64.8
+	github.com/golangci/golangci-lint/v2 v2.1.5
 	github.com/google/go-cmp v0.7.0
 	github.com/shurcooL/githubv4 v0.0.0-20230704064427-599ae7bbf278
 	github.com/slack-go/slack v0.12.2
