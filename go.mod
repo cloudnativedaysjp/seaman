@@ -7,7 +7,7 @@ toolchain go1.24.2
 require (
 	github.com/cloudnativedaysjp/emtec-ecu v0.2.0
 	github.com/creasty/defaults v1.8.0
-	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/go-playground/webhooks/v6 v6.4.0
 	github.com/golang/mock v1.6.0
