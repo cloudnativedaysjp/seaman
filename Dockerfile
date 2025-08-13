@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.17
 ### builder ###
-FROM golang:1.24 as builder
+FROM golang:1.25 as builder
 
 WORKDIR /workspace
 # Arguments
