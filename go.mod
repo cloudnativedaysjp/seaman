@@ -1,8 +1,8 @@
 module github.com/cloudnativedaysjp/seaman
 
-go 1.23.0
+go 1.24.0
 
-toolchain go1.24.6
+toolchain go1.25.0
 
 require (
 	github.com/cloudnativedaysjp/emtec-ecu v0.2.0
@@ -11,23 +11,23 @@ require (
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/go-playground/webhooks/v6 v6.4.0
 	github.com/golang/mock v1.6.0
-	github.com/golangci/golangci-lint/v2 v2.3.1
+	github.com/golangci/golangci-lint/v2 v2.4.0
 	github.com/google/go-cmp v0.7.0
 	github.com/shurcooL/githubv4 v0.0.0-20240727222349-48295856cce7
 	github.com/slack-go/slack v0.17.3
-	golang.org/x/exp v0.0.0-20250808145144-a408d31f581a
+	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
 	golang.org/x/oauth2 v0.30.0
 	golang.org/x/sync v0.16.0
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da
-	google.golang.org/grpc v1.74.2
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/grpc v1.75.0
+	google.golang.org/protobuf v1.36.8
 	sigs.k8s.io/yaml v1.6.0
 )
 
 require (
 	4d63.com/gocheckcompilerdirectives v1.3.0 // indirect
 	4d63.com/gochecknoglobals v0.2.2 // indirect
-	github.com/4meepo/tagalign v1.4.2 // indirect
+	github.com/4meepo/tagalign v1.4.3 // indirect
 	github.com/Abirdcfly/dupword v0.1.6 // indirect
 	github.com/Antonboom/errname v1.1.0 // indirect
 	github.com/Antonboom/nilnil v1.1.0 // indirect
@@ -37,7 +37,7 @@ require (
 	github.com/GaijinEntertainment/go-exhaustruct/v3 v3.3.1 // indirect
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/OpenPeeDeeP/depguard/v2 v2.2.1 // indirect
-	github.com/alecthomas/chroma/v2 v2.19.0 // indirect
+	github.com/alecthomas/chroma/v2 v2.20.0 // indirect
 	github.com/alecthomas/go-check-sumtype v0.3.1 // indirect
 	github.com/alexkohler/nakedret/v2 v2.0.6 // indirect
 	github.com/alexkohler/prealloc v1.0.0 // indirect
@@ -212,8 +212,8 @@ require (
 	go.augendre.info/fatcontext v0.8.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
-	go.uber.org/multierr v1.8.0 // indirect
-	go.uber.org/zap v1.24.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
+	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250620022241-b7579e27df2b // indirect
