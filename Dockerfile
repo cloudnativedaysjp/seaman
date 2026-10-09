@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.17
 ### builder ###
-FROM golang:1.24 as builder
+FROM --platform=$BUILDPLATFORM golang:1.24 AS builder
 
 WORKDIR /workspace
 # Arguments
@@ -12,11 +12,11 @@ COPY --link go.sum go.sum
 RUN go mod download
 COPY --link . .
 # Build
-ARG GOOS=linux
-ARG GOARCH=amd64
+ARG TARGETOS
+ARG TARGETARCH
 RUN --mount=type=cache,target=/go/pkg/mod \
   --mount=type=cache,target=/root/.cache/go-build \
-  CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -ldflags "\
+  CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags "\
   -X github.com/cloudnativedaysjp/seaman/internal/version.Version=${APP_VERSION} \
   -X github.com/cloudnativedaysjp/seaman/internal/version.Commit=${APP_COMMIT} \
   -s -w \
